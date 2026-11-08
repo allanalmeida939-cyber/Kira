@@ -3496,6 +3496,15 @@ async def entrypoint(ctx: agents.JobContext):
             )
             if current_room_connected and current_room_name == entry_room_name:
                 logger.warning("ENTRYPOINT_DUPLICATE_IGNORED reason=active_room_connected_same_room")
+                # O servidor pediu outro agente porque não sabe que este já está pronto na sala (sala pré-aquecida antes
+                # do clique): avisa de novo, senão a tela fica em "Kira iniciando..." para sempre (2026-11-07 22:47).
+                for _phase in ("room_connected", "runtime_ready", "worker_ready"):
+                    try:
+                        await _notify_ui_agent_ready_with_retry(_phase, message="Sessao ja conectada.", room_name=entry_room_name,
+                                                                attempts=3, delay_seconds=0.5)
+                    except Exception as _re_exc:  # noqa: BLE001
+                        logger.warning("ENTRYPOINT_DUPLICATE_READY_RENOTIFY_FAILED phase=%s reason=%s", _phase, _re_exc)
+                logger.info("ENTRYPOINT_DUPLICATE_READY_RENOTIFIED room=%s", entry_room_name)
                 try:
                     ctx.shutdown("duplicate active room ignored")
                     logger.warning("ENTRYPOINT_DUPLICATE_SHUTDOWN job_id=%s", entry_job_id)
@@ -10101,6 +10110,9 @@ async def entrypoint(ctx: agents.JobContext):
                 if reached_functional_ready:
                     logger.info("ENTRYPOINT_CLEANUP_KEEP_ACTIVE_SESSION reason=functional_ready")
                     logger.info("GEMINI_ECONOMY_CONTROL_KEEP_ACTIVE reason=functional_ready")
+                    # a sala desta sessão FECHOU: sem isso o próximo "Iniciar sessão" era recusado como duplicado de
+                    # um agente que já não existia, e a tela ficava em "Kira iniciando..." (2026-11-07 22:57)
+                    _ENTRYPOINT_STATE["room_connected"] = False
                 else:
                     _ENTRYPOINT_BOOT_ACTIVE = False
                     _ENTRYPOINT_CALLED = False
