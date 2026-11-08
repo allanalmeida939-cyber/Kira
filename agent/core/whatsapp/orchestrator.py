@@ -105,6 +105,8 @@ class WhatsappOrchestrator:
         signed_message, first_person = _apply_perspective(message, first_person_hint=first_person)
         normalized_message = normalize_whatsapp_text(signed_message)
         normalized_message, placeholder = fill_clipboard_placeholders(normalized_message)
+        normalized_message = attach_clipboard_if_asked(
+            normalized_message, str(getattr(self._speaker, "_last_user_utterance", "") or ""))
         if placeholder:  # sobrou "[Link ...]": nunca manda marcador no lugar do conteúdo de verdade
             return (f"Não mandei: a mensagem ficou com '{placeholder}' no lugar do conteúdo. Me diga o texto ou o link "
                     "certo (ou copie de novo e peça para mandar o que está no seu copiar).")
@@ -187,7 +189,7 @@ class WhatsappOrchestrator:
             "pode mandar. NAO fale o prefixo tecnico 'Kira:' (so existe no texto real do "
             f"WhatsApp). A mensagem a anunciar e: \"{spoken}\"."
         )
-        return speech_policy.build_preview_text(job, spoken)
+        return "AINDA NAO ENVIADO (nao diga que mandou): " + speech_policy.build_preview_text(job, spoken)
 
     async def handle(self, transcript: str) -> dict:
         """Chamado pelo assistant quando ha intent WhatsApp e job aguardando.
@@ -272,6 +274,11 @@ class WhatsappOrchestrator:
             "diz pra", "diz pro", "whatsapp", "wpp", "zap",
         )
         if any(term in utt for term in send_terms):
+            return True
+        # resposta curta ao "posso mandar?" que a própria Kira fez ("pode", "sim", "isso") também é pedido de envio
+        # (2026-11-07: o "pode" virava outra confirmação e a Kira dizia "mandei" sem ter mandado)
+        words = utt.strip(" .!?,").split()
+        if words and len(words) <= 4 and words[0] in {"pode", "sim", "isso", "manda", "envia", "bora", "ok", "beleza", "claro", "confirmo", "positivo"}:
             return True
         first_name = str(contact or "").strip().lower().split()[:1]
         if first_name and first_name[0] and first_name[0] in utt:
@@ -448,4 +455,20 @@ def fill_clipboard_placeholders(message: str, reader=_read_clipboard_text) -> tu
     rest = next((h.group(0) for h in _PLACEHOLDER_RE.finditer(text)
                  if any(w in h.group(0).lower() for w in _CLIPBOARD_WORDS + ("nome", "contato", "numero", "número", "aqui"))), "")
     return text, rest
+
+
+_ASKS_CLIPBOARD = __import__("re").compile(
+    r"(?i)(copi|clipboard|rea de transfer|ctrl ?\+? ?c)")
+
+
+def attach_clipboard_if_asked(message: str, request_text: str, reader=_read_clipboard_text) -> str:
+    """Pedido fala em "o que copiei / meu copiar" e a mensagem não traz o conteúdo: cola o conteúdo no fim
+    (2026-11-07: a Kira escrevia "o link que ele copiou" e mandava sem o link)."""
+    text = str(message or "")
+    if not (_ASKS_CLIPBOARD.search(request_text or "") or _ASKS_CLIPBOARD.search(text)):
+        return text
+    clip = reader()[:2000]
+    if not clip or clip in text:
+        return text
+    return text.rstrip() + "\n" + clip
 

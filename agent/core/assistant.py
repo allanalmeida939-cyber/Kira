@@ -6036,36 +6036,6 @@ ABAS DISPONIVEIS:
         except Exception:
             return
 
-    @function_tool(
-        name="clipboard_copy_text",
-        description="Clipboard temporariamente desativado por seguranca.",
-    )
-    async def clipboard_copy_text(self, text: str) -> str:
-        del text
-        logger.info("CLIPBOARD_TEMP_DISABLED action=copy_text")
-        return "O copiar esta temporariamente desativado para nao quebrar a Kira. Posso te mostrar o texto aqui."
-
-    @function_tool(
-        name="clipboard_copy_screenshot",
-        description="Clipboard temporariamente desativado por seguranca.",
-    )
-    async def clipboard_copy_screenshot(self, save: bool = False) -> str:
-        del save
-        logger.info("CLIPBOARD_TEMP_DISABLED action=copy_screenshot")
-        return "Ainda desativei o copiar por seguranca, chefe. Depois a gente reativa isso direito."
-
-    @function_tool(
-        name="clipboard_capabilities",
-        description="Clipboard temporariamente desativado por seguranca.",
-    )
-    async def clipboard_capabilities(self) -> str:
-        logger.info("CLIPBOARD_TEMP_DISABLED action=capabilities")
-        return json.dumps(
-            {
-                "available": False,
-                "temporarily_disabled": True,
-                "reason": "clipboard_manager_disabled_for_stability",
-            },
-            ensure_ascii=False,
-        )
+    # 2026-11-07: clipboard_copy_text/_screenshot/_capabilities removidos: diziam ao Gemini "clipboard desativado" e
+    # ele recusava ler o copiar/colar (a ferramenta area_de_transferencia faz tudo isso).
 
