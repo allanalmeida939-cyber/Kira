@@ -104,6 +104,10 @@ class WhatsappOrchestrator:
 
         signed_message, first_person = _apply_perspective(message, first_person_hint=first_person)
         normalized_message = normalize_whatsapp_text(signed_message)
+        normalized_message, placeholder = fill_clipboard_placeholders(normalized_message)
+        if placeholder:  # sobrou "[Link ...]": nunca manda marcador no lugar do conteúdo de verdade
+            return (f"Não mandei: a mensagem ficou com '{placeholder}' no lugar do conteúdo. Me diga o texto ou o link "
+                    "certo (ou copie de novo e peça para mandar o que está no seu copiar).")
         if not normalized_message or len(_strip_kira(normalized_message)) < 2:
             return f"Nao consegui montar uma mensagem valida para {normalized_contact}."
 
@@ -410,3 +414,38 @@ class WhatsappOrchestrator:
             record_send_result(job.contact, job.message, "", bool(success))
         except Exception:
             pass
+
+
+_PLACEHOLDER_RE = __import__("re").compile(r"\[[^\[\]]{2,60}\]")
+_CLIPBOARD_WORDS = ("clipboard", "copiad", "copiar", "area de transfer", "área de transfer", "link", "url", "colad")
+
+
+def _read_clipboard_text() -> str:
+    try:
+        import win32clipboard  # type: ignore
+        win32clipboard.OpenClipboard()
+        try:
+            if win32clipboard.IsClipboardFormatAvailable(win32clipboard.CF_UNICODETEXT):
+                return str(win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT) or "").strip()
+        finally:
+            win32clipboard.CloseClipboard()
+    except Exception:  # noqa: BLE001 - sem acesso ao copiar/colar: fica o marcador (e o envio é recusado)
+        return ""
+    return ""
+
+
+def fill_clipboard_placeholders(message: str, reader=_read_clipboard_text) -> tuple[str, str]:
+    """'[Link do Clipboard]' vira o que o Chefe copiou de verdade. Devolve (mensagem, marcador que sobrou ou '')."""
+    text = str(message or "")
+    clip = None
+    for hit in list(_PLACEHOLDER_RE.finditer(text)):
+        token = hit.group(0)
+        if any(w in token.lower() for w in _CLIPBOARD_WORDS):
+            if clip is None:
+                clip = reader()[:2000]
+            if clip:
+                text = text.replace(token, clip)
+    rest = next((h.group(0) for h in _PLACEHOLDER_RE.finditer(text)
+                 if any(w in h.group(0).lower() for w in _CLIPBOARD_WORDS + ("nome", "contato", "numero", "número", "aqui"))), "")
+    return text, rest
+

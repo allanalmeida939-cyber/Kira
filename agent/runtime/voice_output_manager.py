@@ -396,6 +396,11 @@ class VoiceOutputManager:
             req = await self._queue.get()
             _req_source = str(req.source or "").strip().lower()
             _is_browser_source = _req_source in {"browser", "browser_voice", "browser_confirm", "browser_result"}
+            # marca de "usuário falando/digitando" que ninguém limpou (texto digitado, 2026-11-07: o "enviei" do
+            # WhatsApp ficou preso 90 s na fila): vence em 3 s
+            if self._user_input_active and time.monotonic() - getattr(self, "_user_input_active_at", 0.0) > 3.0:
+                self._user_input_active = False
+                logger.info("VOICE_INPUT_ACTIVE_STALE_CLEARED request_id=%s", req.request_id)
             if self._user_input_active and req.priority >= VoiceOutputPriority.VOICE_PRIORITY_USER_REPLY:
                 if _is_browser_source:
                     # Browser tasks take 20-30s — user_input_active is stale by then. Let through.
@@ -530,6 +535,7 @@ class VoiceOutputManager:
                     self._mouse_input_clear_handle = None
             return
         self._user_input_active = bool(active)
+        self._user_input_active_at = time.monotonic()
         logger.info("VOICE_INPUT_ACTIVE_SET active=%s reason=%s", str(bool(active)).lower(), reason or "none")
 
     def _auto_clear_mouse_input_active(self) -> None:
