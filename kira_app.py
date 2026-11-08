@@ -9772,6 +9772,8 @@ def build_app():
             failure_reason="",
         )
         logger.info("AGENT_HEARTBEAT_OK stage=%s pid=%s", stage, payload.get("pid", ""))
+        if stage == "runtime_alive":  # agente rodando a sessão de verdade (o vigia da sala não derruba)
+            _AGENT_RUNTIME_ALIVE_AT[0] = now_ts
         if recovering_from_stale:
             checked = _augment_runtime_state(state)
             logger.info(
@@ -14564,6 +14566,9 @@ def stop_agent():
     _agent_ready.clear()
 
 
+_AGENT_RUNTIME_ALIVE_AT = [0.0]  # último heartbeat stage=runtime_alive (sessão rodando)
+
+
 def _boot_timeout_watcher() -> None:
     while True:
         time.sleep(1.0)
@@ -14598,6 +14603,12 @@ def _boot_timeout_watcher() -> None:
                     or _runtime_readiness.agent_connected
                 )
                 room_name = str(_runtime_readiness.room_name or _runtime_readiness.requested_room_name or "").strip()
+                # Agente já conversando (pronto + sinal de vida recente): a sala está boa, só a marca room_ready não
+                # chegou. Antes isso derrubava uma sessão funcionando (2026-11-07 22:35: "reconectando a Kira").
+                if time.time() - _AGENT_RUNTIME_ALIVE_AT[0] < 15:
+                    _runtime_readiness.room_ready = True
+                    logger.info("SESSION_ROOM_TIMEOUT_SKIPPED_AGENT_ALIVE room=%s", room_name)
+                    continue
                 if active_session and token_issued and ui_room_connected and worker_ready and room_name:
                     logger.warning("[SESSION_ROOM_TIMEOUT_DETECTED] room=%s", room_name)
                     _debug_snap = _session_debug_snapshot()
