@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0620">
+<link rel="manifest" href="/manifest.webmanifest">
+<title>Kira</title>
+<!-- Tela de um perfil comum do celular (services/guest_chat.py, services/guest_api.py): conversa por texto ou fala, a
+     resposta na voz da Kira (services/kira_voice.py), cartões das funções que o Chefe liberou (clima, notícias, receita,
+     música, lembretes) e um menu com os ajustes da própria pessoa. Não alcança nada do Chefe (o portão só deixa passar
+     /api/guest). Tudo por textContent. -->
+<style>
+  :root { color-scheme: dark; --bg: #07040f; --card: rgba(20, 12, 40, 0.88); --line: rgba(196, 181, 253, 0.22); --text: #ede9fe; --muted: #a78bfa; --cyan: #67e8f9; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column; overflow: hidden; color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: radial-gradient(120% 70% at 50% 0%, #2a1052 0%, #0d0620 45%, var(--bg) 80%);
+  }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  header { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; padding: max(10px, env(safe-area-inset-top)) 12px 6px; }
+  .icon-btn { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 13px; background: rgba(24, 14, 46, 0.9); }
+  .icon-btn svg, footer button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  header .who { flex: 1; min-width: 0; }
+  header .who b { display: block; letter-spacing: 0.3em; font-size: 0.95rem; text-shadow: 0 0 12px rgba(168, 85, 247, 0.8); }
+  header .who span { font-size: 0.8rem; color: var(--muted); }
+  .orb-wrap { display: grid; place-items: center; height: 170px; flex: none; transition: height 0.35s cubic-bezier(0.2, 0.85, 0.25, 1); }
+  body.chatting .orb-wrap { height: 86px; }
+  .orb { position: relative; width: 116px; height: 116px; border-radius: 50%; transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.25, 1); will-change: transform; }
+  body.chatting .orb { transform: scale(0.6); }
+  .orb::before, .orb::after, .orb i { content: ""; position: absolute; inset: 0; border-radius: 50%; }
+  .orb::before { background: radial-gradient(circle at 38% 32%, #fdf4ff 0%, #e879f9 18%, #9333ea 46%, #3b0764 74%, transparent 76%); box-shadow: 0 0 46px rgba(168, 85, 247, 0.6); }
+  .orb::after { inset: -10px; border: 2px solid transparent; border-top-color: rgba(240, 171, 252, 0.85); border-right-color: rgba(168, 85, 247, 0.4); animation: spin 6s linear infinite; }
+  .orb i { inset: -20px; border: 1px dashed rgba(103, 232, 249, 0.35); animation: spin 14s linear infinite reverse; }
+  body.speaking .orb::before { animation: pulse 0.8s ease-in-out infinite; }
+  body.listening .orb::after { border-top-color: #f472b6; animation-duration: 1.2s; }
+  body.thinking .orb i { animation-duration: 2.5s; border-color: rgba(103, 232, 249, 0.75); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 50% { transform: scale(1.08); filter: brightness(1.18); } }
+  main { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 12px 12px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .msg { max-width: 86%; padding: 10px 13px; border-radius: 16px; line-height: 1.42; font-size: 0.95rem; white-space: pre-wrap; word-wrap: break-word; animation: rise 0.28s cubic-bezier(0.2, 0.85, 0.25, 1) both; }
+  .msg.me { align-self: flex-end; background: linear-gradient(135deg, #7c3aed, #a21caf); border-bottom-right-radius: 4px; }
+  .msg.kira { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .msg.wait { color: var(--muted); }
+  .msg.alert { align-self: stretch; max-width: none; border-color: rgba(244, 114, 182, 0.7); background: rgba(131, 24, 67, 0.35); }
+  @keyframes rise { from { transform: translate3d(0, 10px, 0); opacity: 0; } }
+  .hello { margin: auto; text-align: center; color: var(--muted); font-size: 0.9rem; padding: 0 24px; line-height: 1.5; }
+  .note { padding: 0 14px 4px; font-size: 0.75rem; color: var(--muted); min-height: 1em; text-align: center; }
+  footer { position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(8, 4, 18, 0.94); }
+  textarea { flex: 1; min-height: 48px; max-height: 120px; resize: none; padding: 13px 14px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, 0.05); color: var(--text); font: inherit; font-size: 16px; outline: none; }
+  textarea:focus { border-color: #c084fc; }
+  footer button { flex: none; width: 48px; height: 48px; border: 0; border-radius: 50%; color: #fff; background: rgba(139, 92, 246, 0.25); display: grid; place-items: center; }
+  #send { background: linear-gradient(135deg, #7c3aed, #c026d3); }
+  #mic { width: 56px; height: 56px; margin-top: -8px; background: linear-gradient(135deg, #a855f7, #4c1d95); box-shadow: 0 0 0 3px rgba(10, 6, 24, 0.95), 0 6px 18px rgba(124, 58, 237, 0.45); }
+  #mic.on { background: linear-gradient(135deg, #f472b6, #be123c); }
+
+  /* cartões (clima, notícias, receita, música, lembrete) */
+  .card { align-self: stretch; padding: 12px 14px; border: 1px solid rgba(103, 232, 249, 0.35); border-radius: 16px; background: linear-gradient(160deg, rgba(14, 30, 52, 0.9), rgba(20, 12, 40, 0.92)); box-shadow: 0 0 22px rgba(34, 211, 238, 0.12); animation: rise 0.32s cubic-bezier(0.2, 0.85, 0.25, 1) both; }
+  .card h3 { margin: 0 0 8px; font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cyan); }
+  .card .big { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+  .card .row { display: flex; gap: 8px; overflow-x: auto; padding-top: 10px; scrollbar-width: none; }
+  .card .day { flex: none; min-width: 74px; padding: 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); text-align: center; font-size: 0.78rem; }
+  .card .day b { display: block; font-size: 0.95rem; }
+  .card a { color: #e9d5ff; text-decoration: none; }
+  .card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .card li.news { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+  .card li.news small { color: var(--muted); }
+  .card .muted { color: var(--muted); font-size: 0.8rem; }
+  .card .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pill { padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(39, 23, 79, 0.85); font-size: 0.85rem; font-weight: 700; }
+  .pill.main { border-color: transparent; background: linear-gradient(135deg, #a855f7, #6d28d9); }
+  .pill.cyan { border-color: rgba(103, 232, 249, 0.55); background: rgba(8, 47, 73, 0.7); color: #cffafe; }
+  .pill:disabled { opacity: 0.4; }
+  .recipe-step { margin-top: 10px; padding: 12px; border-radius: 12px; border: 1px solid rgba(240, 171, 252, 0.7); background: rgba(88, 28, 135, 0.4); font-size: 1.02rem; line-height: 1.45; }
+  .recipe-step small { display: block; margin-bottom: 4px; color: #f0abfc; font-weight: 800; letter-spacing: 0.08em; }
+  .ing { padding: 4px 0 4px 26px; position: relative; }
+  .ing::before { content: ""; position: absolute; left: 2px; top: 7px; width: 14px; height: 14px; border: 1.5px solid rgba(196, 181, 253, 0.7); border-radius: 4px; }
+  .ing.done { color: #a1a1aa; text-decoration: line-through; }
+  .ing.done::before { background: #a855f7; border-color: #a855f7; }
+  .timer { display: inline-flex; gap: 8px; align-items: baseline; margin: 8px 8px 0 0; padding: 6px 12px; border: 1px solid rgba(103, 232, 249, 0.55); border-radius: 12px; background: rgba(8, 47, 73, 0.5); }
+  .timer b { font-variant-numeric: tabular-nums; font-size: 1.1rem; }
+  .timer.done { border-color: #f472b6; animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: 0.5; } }
+  .video { position: relative; margin-top: 8px; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* menu */
+  .backdrop { position: fixed; inset: 0; z-index: 9; background: rgba(4, 2, 12, 0.6); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+  .drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 10; width: min(84vw, 330px); display: flex; flex-direction: column; gap: 4px; padding: max(18px, env(safe-area-inset-top)) 12px 18px; overflow-y: auto; background: linear-gradient(180deg, #160c2e, #0b0618); border-right: 1px solid rgba(167, 139, 250, 0.25); transform: translate3d(-102%, 0, 0); transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.25, 1); }
+  body.menu-open .drawer { transform: none; }
+  body.menu-open .backdrop { opacity: 1; pointer-events: auto; }
+  .drawer h2 { margin: 4px 8px 12px; font-size: 0.95rem; letter-spacing: 0.3em; color: #c4b5fd; }
+  .item { display: grid; gap: 2px; width: 100%; padding: 12px; border: 0; border-radius: 12px; background: transparent; text-align: left; }
+  .item:active, .item.open { background: rgba(139, 92, 246, 0.2); }
+  .item b { font-size: 0.95rem; }
+  .item span { font-size: 0.75rem; color: var(--muted); }
+  .item[hidden] { display: none; }
+  .panel { display: grid; gap: 10px; margin: 0 4px 8px; padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+  .panel[hidden] { display: none; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.88rem; }
+  .switch input { width: 44px; height: 24px; accent-color: #a855f7; }
+  .field { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.05); color: var(--text); font: inherit; font-size: 16px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: rgba(139, 92, 246, 0.18); font-size: 0.8rem; }
+  .chip::after { content: " ✕"; opacity: 0.6; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+  <header>
+    <button class="icon-btn" id="menu-btn" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="who"><b>KIRA</b><span id="hello">Olá</span></div>
+  </header>
+  <div class="orb-wrap" aria-hidden="true"><div class="orb"><i></i></div></div>
+  <main id="list" aria-live="polite"><p class="hello" id="empty">Pode falar ou escrever.<br>Eu respondo por aqui e em voz alta.</p></main>
+  <div class="note" id="note"></div>
+  <footer>
+    <textarea id="text" rows="1" placeholder="Escreva para a Kira…" aria-label="Mensagem"></textarea>
+    <button id="mic" type="button" aria-label="Falar"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button id="send" type="button" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7-7-1Z"/></svg></button>
+  </footer>
+  <div class="backdrop" id="backdrop"></div>
+  <nav class="drawer" id="drawer" aria-label="Menu">
+    <h2>KIRA</h2>
+    <button class="item" type="button" id="m-briefing"><b>Meu resumo do dia</b><span>Clima, notícias do que você curte e seus lembretes</span></button>
+    <button class="item" type="button" id="m-reminders"><b>Meus lembretes</b><span>O que vou te avisar</span></button>
+    <button class="item" type="button" id="m-settings"><b>Meus ajustes</b><span>Voz, cidade e interesses</span></button>
+    <div class="panel" id="settings" hidden>
+      <label class="switch">Responder em voz alta <input type="checkbox" id="s-voice"></label>
+      <label class="switch">Avisos por voz (lembretes) <input type="checkbox" id="s-alerts"></label>
+      <label>Sua cidade (para o clima)<input class="field" id="s-city" placeholder="Ex.: Fortaleza" autocomplete="address-level2"></label>
+      <div>Interesses (notícias e resumo)</div>
+      <div class="chips" id="s-chips"></div>
+      <input class="field" id="s-interest" placeholder="Adicionar: futebol, cinema, tecnologia…" enterkeyhint="done">
+    </div>
+    <button class="item" type="button" id="m-notify"><b>Ativar notificações</b><span>A Kira avisa no celular, mesmo com o app fechado</span></button>
+    <button class="item" type="button" id="m-install"><b>Instalar o app da Kira</b><span>Ícone na tela inicial</span></button>
+    <button class="item" type="button" id="m-switch"><b>Trocar de perfil</b><span>Sair deste perfil neste aparelho</span></button>
+    <p class="note" id="features-note"></p>
+  </nav>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, className = '', text = '') => { const node = document.createElement(tag); if (className) node.className = className; if (text) node.textContent = text; return node; };
+  const list = $('list'), input = $('text'), note = (text) => { $('note').textContent = text || ''; };
+  const body = document.body;
+  let me = { name: (window.KIRA_PROFILE || {}).name || '', features: {}, settings: { voz: true, avisos_voz: true, cidade: '', interesses: [] }, voice: false };
+  $('hello').textContent = me.name ? `Olá, ${me.name}` : 'Olá';
+  const post = (path, data) => fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data || {}) });
+
+  // ---------- voz da Kira (MP3 do backend); sem ela, a voz do navegador ----------
+  const player = new Audio();
+  player.preload = 'auto';
+  let queue = [];
+  let speakingToken = 0;
+  function stopVoice() {
+    speakingToken += 1;
+    queue = [];
+    player.pause();
+    window.speechSynthesis?.cancel();
+    body.classList.remove('speaking');
+  }
+  function browserVoice(text) {
+    if (!window.speechSynthesis) return;
+    const say = new SpeechSynthesisUtterance(text);
+    say.lang = 'pt-BR';
+    const voice = speechSynthesis.getVoices().find((item) => item.lang?.toLowerCase().startsWith('pt'));
+    if (voice) say.voice = voice;
+    say.onstart = () => body.classList.add('speaking');
+    say.onend = say.onerror = () => body.classList.remove('speaking');
+    speechSynthesis.speak(say);
+  }
+  function chunks(text) {
+    // frase por frase, pedidas juntas: a voz leva quase o tempo da fala para ficar pronta, então a primeira frase
+    // (curta) começa logo e as outras chegam enquanto ela fala; frases curtas vão juntas (no máximo 4 pedaços)
+    const clean = String(text || '').replace(/\s+/g, ' ').trim();
+    const sentences = clean.match(/[^.!?…]+[.!?…]+["')\]]*\s*|[^.!?…]+$/g) || (clean ? [clean] : []);
+    const out = [];
+    for (const piece of sentences.map((x) => x.trim()).filter(Boolean)) {
+      const last = out[out.length - 1];
+      if (out.length > 1 && (last.length < 60 || out.length >= 4)) out[out.length - 1] = `${last} ${piece}`;
+      else out.push(piece);
+    }
+    return out;
+  }
+  async function speak(text) {
+    if (!me.settings.voz || !text) return;
+    const token = speakingToken;
+    if (!me.voice) { browserVoice(text); return; }
+    const parts = chunks(text).map((part) => post('/api/guest/speak', { text: part }).then((r) => (r.ok ? r.blob() : null)).catch(() => null));
+    for (let index = 0; index < parts.length; index += 1) {
+      const blob = await parts[index];
+      if (token !== speakingToken) return;
+      if (!blob) { browserVoice(chunks(text).slice(index).join(' ')); return; }
+      await new Promise((resolve) => {
+        const url = URL.createObjectURL(blob);
+        player.src = url;
+        player.onended = player.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+        body.classList.add('speaking');
+        player.play().catch(() => resolve());
+      });
+    }
+    if (token === speakingToken) body.classList.remove('speaking');
+  }
+
+  // ---------- conversa ----------
+  function add(who, text, extra = '') {
+    $('empty')?.remove();
+    body.classList.add('chatting');
+    const node = el('div', `msg ${who} ${extra}`.trim(), text);
+    list.append(node);
+    list.scrollTop = list.scrollHeight;
+    return node;
+  }
+  function addCard(node) {
+    $('empty')?.remove();
+    body.classList.add('chatting');
+    list.append(node);
+    requestAnimationFrame(() => node.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+  }
+
+  const fmtTime = (iso) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); };
+  const deg = (v) => (typeof v === 'number' ? `${Math.round(v)}°` : '—');
+  const mmss = (ms) => { const t = Math.max(0, Math.round(ms / 1000)); const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`; };
+
+  function weatherCard(c) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', `Clima · ${c.city || ''}`));
+    const now = el('div');
+    now.append(el('span', 'big', deg(c.now?.temp)), el('span', 'muted', `  ${c.now?.condition || ''}`));
+    card.append(now);
+    const row = el('div', 'row');
+    (c.days || []).forEach((day, i) => {
+      const box = el('div', 'day');
+      const label = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : new Date(`${day.date}T12:00`).toLocaleDateString('pt-BR', { weekday: 'short' });
+      box.append(el('b', '', label), el('div', '', `${deg(day.min)} / ${deg(day.max)}`), el('div', 'muted', typeof day.rain === 'number' ? `chuva ${day.rain}%` : (day.condition || '')));
+      row.append(box);
+    });
+    card.append(row);
+    return card;
+  }
+  function newsCard(c) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', `Notícias${c.topic ? ` · ${c.topic}` : ''}`));
+    const ul = el('ul');
+    (c.items || []).forEach((item) => {
+      const li = el('li', 'news');
+      const link = el('a', '', item.title);
+      if (/^https:\/\//.test(item.url || '')) { link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+      li.append(link, el('small', '', item.source || ''));
+      ul.append(li);
+    });
+    card.append(ul);
+    return card;
+  }
+  function musicCard(c) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', 'Tocando'), el('div', '', c.title || ''), el('div', 'muted', c.channel || ''));
+    if (/^[A-Za-z0-9_-]{11}$/.test(c.videoId || '')) {
+      const box = el('div', 'video');
+      const frame = el('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${c.videoId}?autoplay=1&playsinline=1`;
+      frame.allow = 'autoplay; encrypted-media; picture-in-picture';
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.title = c.title || 'Vídeo';
+      box.append(frame);
+      card.append(box);
+    }
+    return card;
+  }
+  function reminderCard(c) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', 'Lembrete marcado'), el('div', '', c.text || ''), el('div', 'muted', fmtTime(c.when)));
+    return card;
+  }
+  function remindersCard(items) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', 'Seus lembretes'));
+    if (!items.length) card.append(el('div', 'muted', 'Nada marcado. É só pedir: "me lembra de ... às 20h".'));
+    const ul = el('ul');
+    items.forEach((item) => {
+      const li = el('li', 'news');
+      const remove = el('button', 'pill', 'Apagar');
+      remove.type = 'button';
+      remove.addEventListener('click', async () => { await fetch(`/api/guest/reminders/${encodeURIComponent(item.id)}`, { method: 'DELETE' }); li.remove(); });
+      li.append(el('b', '', item.text), el('small', '', fmtTime(item.when)), remove);
+      ul.append(li);
+    });
+    card.append(ul);
+    return card;
+  }
+  // receita guiada: ingredientes para ticar, um passo por vez (lido em voz alta) e timer do passo
+  function recipeCard(r) {
+    const card = el('section', 'card');
+    card.append(el('h3', '', 'Receita'), el('b', '', r.title || ''));
+    const meta = [r.servings ? `${r.servings} porções` : '', r.totalMinutes ? `${r.totalMinutes} min` : '', r.difficulty || ''].filter(Boolean).join(' · ');
+    if (meta) card.append(el('div', 'muted', meta));
+    const ings = el('div');
+    (r.ingredients || []).forEach((text) => { const row = el('div', 'ing', text); row.addEventListener('click', () => row.classList.toggle('done')); ings.append(row); });
+    card.append(ings);
+    const stepBox = el('div', 'recipe-step');
+    stepBox.hidden = true;
+    const timers = el('div');
+    const actions = el('div', 'actions');
+    const steps = r.steps || [];
+    let index = -1;
+    const button = (label, cls, fn) => { const b = el('button', `pill ${cls}`, label); b.type = 'button'; b.addEventListener('click', fn); return b; };
+    const prev = button('‹ Anterior', '', () => show(index - 1));
+    const next = button('Começar', 'main', () => show(index + 1));
+    const again = button('Repetir', '', () => show(index));
+    const timerBtn = button('⏲ Timer', 'cyan', () => startTimer());
+    function show(i) {
+      if (i < 0 || i >= steps.length) return;
+      index = i;
+      stepBox.hidden = false;
+      stepBox.replaceChildren(el('small', '', `PASSO ${i + 1} DE ${steps.length}`), el('div', '', steps[i].text));
+      prev.disabled = i === 0;
+      next.textContent = i >= steps.length - 1 ? 'Fim!' : 'Próximo ›';
+      next.disabled = i >= steps.length - 1;
+      timerBtn.hidden = !(steps[i].minutes > 0);
+      timerBtn.textContent = `⏲ Marcar ${steps[i].minutes} min`;
+      stopVoice();
+      speak(`Passo ${i + 1}. ${steps[i].text}${steps[i].minutes ? ` Quer que eu marque ${steps[i].minutes} minutos?` : ''}`);
+      stepBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    function startTimer() {
+      const minutes = steps[index]?.minutes || 0;
+      if (!minutes) return;
+      const label = `Passo ${index + 1}`;
+      const ends = Date.now() + minutes * 60000;
+      const chip = el('span', 'timer');
+      const clock = el('b', '', mmss(minutes * 60000));
+      chip.append(el('span', '', label), clock);
+      timers.append(chip);
+      let alarm = null;
+      const tick = setInterval(() => {
+        const left = ends - Date.now();
+        clock.textContent = left > 0 ? mmss(left) : 'pronto!';
+        if (left <= 0) {
+          clearInterval(tick);
+          if (alarm) fetch(`/api/guest/reminders/${encodeURIComponent(alarm)}`, { method: 'DELETE' }).catch(() => {}); // a tela já avisou
+          chip.classList.add('done');
+          add('kira', `⏲ Timer do ${label} acabou! (${r.title})`, 'alert');
+          speak(`Ei! O timer do ${label.toLowerCase()} acabou.`);
+          try { navigator.vibrate?.([300, 150, 300]); } catch (_) {}
+        }
+      }, 1000);
+      speak(`Marquei ${minutes} minutos.`);
+      // fechou a tela: o lembrete avisa no celular também
+      if (me.features.lembretes) post('/api/guest/reminders', { minutes, text: `Timer da receita: ${r.title} (${label})` }).then((x) => x.json()).then((x) => { alarm = x?.id || null; }).catch(() => {});
+    }
+    timerBtn.hidden = true;
+    actions.append(prev, again, timerBtn, next);
+    prev.disabled = true;
+    card.append(stepBox, timers, actions);
+    (r.tips || []).forEach((tip) => card.append(el('div', 'muted', `Dica: ${tip}`)));
+    return card;
+  }
+  function renderCard(c) {
+    if (!c || typeof c !== 'object') return;
+    const make = { clima: weatherCard, noticias: newsCard, musica: musicCard, lembrete: reminderCard, receita: recipeCard, lembretes: (x) => remindersCard(x.items || []) }[c.type];
+    if (make) addCard(make(c));
+  }
+
+  let busy = false;
+  async function send(textArg) {
+    const text = String(textArg ?? input.value).trim();
+    if (!text || busy) return;
+    busy = true;
+    stopVoice();
+    input.value = '';
+    add('me', text);
+    const waiting = add('kira', '…', 'wait');
+    body.classList.add('thinking');
+    try {
+      const answer = await (await post('/api/guest/chat', { text })).json();
+      waiting.classList.remove('wait');
+      waiting.textContent = answer.reply || 'Não consegui responder agora.';
+      renderCard(answer.card);
+      if (answer.say) add('kira', answer.say);
+      if (answer.ok) speak([waiting.textContent, answer.say].filter(Boolean).join(' '));
+    } catch (_) {
+      waiting.textContent = 'Sem conexão com a Kira agora.';
+    }
+    body.classList.remove('thinking');
+    busy = false;
+  }
+  $('send').addEventListener('click', () => send());
+  input.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } });
+
+  // fala -> texto pelo próprio navegador (Chrome); a resposta volta na voz da Kira
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  $('mic').addEventListener('click', () => {
+    if (!Recognition) { note('Este navegador não entende fala: use o Chrome ou escreva.'); return; }
+    if (recognition) { recognition.stop(); return; }
+    stopVoice();
+    player.play().catch(() => {}); // libera o som da resposta (precisa de um toque)
+    player.pause();
+    recognition = new Recognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = true;
+    let heard = '';
+    recognition.onresult = (event) => { heard = [...event.results].map((result) => result[0].transcript).join(' '); input.value = heard; };
+    recognition.onerror = (event) => note(event.error === 'not-allowed' ? 'Libere o microfone para falar.' : 'Não entendi, tenta de novo.');
+    recognition.onend = () => {
+      $('mic').classList.remove('on');
+      body.classList.remove('listening');
+      recognition = null;
+      if (heard.trim()) send(heard);
+    };
+    note('');
+    $('mic').classList.add('on');
+    body.classList.add('listening');
+    recognition.start();
+  });
+
+  // ---------- menu ----------
+  const openMenu = (open) => { body.classList.toggle('menu-open', open); $('menu-btn').setAttribute('aria-expanded', String(open)); };
+  $('menu-btn').addEventListener('click', () => openMenu(!body.classList.contains('menu-open')));
+  $('backdrop').addEventListener('click', () => openMenu(false));
+  $('m-settings').addEventListener('click', () => { const panel = $('settings'); panel.hidden = !panel.hidden; $('m-settings').classList.toggle('open', !panel.hidden); });
+  $('m-switch').addEventListener('click', () => { location.href = '/sair'; });
+  $('m-briefing').addEventListener('click', async () => {
+    openMenu(false);
+    add('me', 'Meu resumo do dia');
+    const waiting = add('kira', '…', 'wait');
+    body.classList.add('thinking');
+    try {
+      const data = await (await post('/api/guest/briefing')).json();
+      const parts = data.parts || [];
+      waiting.classList.remove('wait');
+      waiting.textContent = parts.length ? `Bora, ${me.name || ''}! Aqui vai o seu resumo.` : 'Ainda não tenho o que resumir: coloque sua cidade e seus interesses em Meus ajustes.';
+      parts.forEach((part) => renderCard(part.card));
+      speak([waiting.textContent, ...parts.map((part) => part.say)].filter(Boolean).join(' '));
+    } catch (_) { waiting.textContent = 'Não consegui montar o resumo agora.'; }
+    body.classList.remove('thinking');
+  });
+  $('m-reminders').addEventListener('click', async () => {
+    openMenu(false);
+    try { const data = await (await fetch('/api/guest/reminders', { cache: 'no-store' })).json(); renderCard({ type: 'lembretes', items: data.items || [] }); } catch (_) {}
+  });
+
+  async function saveSettings(changes) {
+    try { const data = await (await post('/api/guest/settings', changes)).json(); if (data.settings) me.settings = data.settings; } catch (_) {}
+    paintSettings();
+  }
+  function paintSettings() {
+    $('s-voice').checked = me.settings.voz !== false;
+    $('s-alerts').checked = me.settings.avisos_voz !== false;
+    if (document.activeElement !== $('s-city')) $('s-city').value = me.settings.cidade || '';
+    $('s-chips').replaceChildren(...(me.settings.interesses || []).map((item) => {
+      const chip = el('button', 'chip', item);
+      chip.type = 'button';
+      chip.addEventListener('click', () => saveSettings({ interesses: me.settings.interesses.filter((x) => x !== item) }));
+      return chip;
+    }));
+  }
+  $('s-voice').addEventListener('change', (e) => { if (!e.target.checked) stopVoice(); saveSettings({ voz: e.target.checked }); });
+  $('s-alerts').addEventListener('change', (e) => saveSettings({ avisos_voz: e.target.checked }));
+  $('s-city').addEventListener('change', (e) => saveSettings({ cidade: e.target.value }));
+  $('s-interest').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const items = e.target.value.split(',').map((x) => x.trim()).filter(Boolean);
+    e.target.value = '';
+    if (items.length) saveSettings({ interesses: [...(me.settings.interesses || []), ...items] });
+  });
+
+  // notificações (Web Push, só para os aparelhos deste perfil) e instalar o app
+  function keyBytes(base64) {
+    const padded = (base64 + '='.repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+    return Uint8Array.from(atob(padded), (char) => char.charCodeAt(0));
+  }
+  async function subscribe(prompt) {
+    if (!navigator.serviceWorker || !window.PushManager || !window.Notification || !window.isSecureContext) { if (prompt) note('Notificações só pelo Chrome, no link seguro.'); return false; }
+    const permission = prompt ? await Notification.requestPermission() : Notification.permission;
+    if (permission !== 'granted') { if (prompt) note('Sem permissão de notificação.'); return false; }
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    const { key } = await (await fetch('/api/phone/push/key', { cache: 'no-store' })).json();
+    const current = await registration.pushManager.getSubscription();
+    const subscription = current || await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(key) });
+    const saved = await (await post('/api/phone/push/subscribe', { subscription: subscription.toJSON() })).json();
+    return Boolean(saved?.ok);
+  }
+  $('m-notify').addEventListener('click', async () => { openMenu(false); try { note((await subscribe(true)) ? 'Notificações ligadas.' : ''); } catch (_) { note('Não consegui ligar agora.'); } });
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); installPrompt = event; });
+  $('m-install').addEventListener('click', () => {
+    openMenu(false);
+    if (installPrompt) { installPrompt.prompt(); installPrompt = null; return; }
+    note(matchMedia('(display-mode: standalone)').matches ? 'Você já está no app da Kira.' : /iPhone|iPad/.test(navigator.userAgent) ? 'No iPhone: Compartilhar > Adicionar à Tela de Início.' : 'No Chrome: menu ⋮ > Instalar app.');
+  });
+
+  // lembretes que tocaram: a tela aberta fala e mostra
+  async function pollDue() {
+    if (!me.features.lembretes) return;
+    try {
+      const data = await (await fetch('/api/guest/reminders', { cache: 'no-store' })).json();
+      (data.due || []).forEach((text) => {
+        add('kira', `🔔 Lembrete: ${text}`, 'alert');
+        if (me.settings.avisos_voz !== false) speak(`Ei, ${me.name || ''}! Lembrete: ${text}`);
+        try { navigator.vibrate?.([200, 100, 200]); } catch (_) {}
+      });
+    } catch (_) {}
+  }
+
+  fetch('/api/guest/me', { cache: 'no-store' }).then((r) => r.json()).then((data) => {
+    if (!data?.ok) return;
+    me = { ...me, ...data };
+    $('hello').textContent = `Olá, ${me.name}`;
+    $('m-reminders').hidden = !me.features.lembretes;
+    $('m-briefing').hidden = !(me.features.clima || me.features.noticias);
+    const off = Object.entries(me.labels || {}).filter(([key]) => !me.features[key]).map(([, label]) => label);
+    $('features-note').textContent = off.length ? `Não liberado neste perfil: ${off.join(', ')}.` : '';
+    paintSettings();
+    setInterval(pollDue, 20000);
+    subscribe(false).catch(() => {});
+  }).catch(() => {});
+  fetch('/api/guest/history', { cache: 'no-store' }).then((r) => r.json()).then((data) => {
+    (data.lines || []).slice(-30).forEach((line) => add(line.who === 'kira' ? 'kira' : 'me', String(line.text || '')));
+  }).catch(() => {});
+})();
+</script>
+</body>
+</html>

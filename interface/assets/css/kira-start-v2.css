@@ -1,0 +1,104 @@
+/* Tela de início nova (2026-10-29): vidro neon estilo HUD. Só sobrescreve o visual da tela de início; botões, estados
+   (state-idle/loading) e ids continuam os mesmos do index.html. */
+#kira-start-screen {
+  --ks-void: #05030c; --ks-ink: #ece6ff; --ks-muted: #9b8fc4; --ks-violet: #a855f7; --ks-magenta: #f0abfc; --ks-cyan: #5eead4;
+  --ks-glass: rgba(26, 14, 52, 0.38); --ks-edge: rgba(196, 160, 255, 0.28); --ks-ok: #4ade80; --ks-warn: #fbbf24; --ks-bad: #f87171;
+  --ks-display: "Chakra Petch", "Orbitron", "Segoe UI", sans-serif; --ks-body: "Sora", "Segoe UI", sans-serif; --ks-mono: "JetBrains Mono", Consolas, monospace;
+  background: var(--ks-void) !important; font-family: var(--ks-body);
+}
+#kira-start-screen #kira-start-bg-canvas { display: none !important; }
+#ks2-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ks2-vignette { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 60% 55% at 50% 48%, rgba(124, 58, 237, 0.22), transparent 70%),
+              radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.85)),
+              repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px); }
+.ks2-bracket { position: absolute; width: 64px; height: 64px; border: 0 solid var(--ks-edge); pointer-events: none; }
+.ks2-bracket.a { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+.ks2-bracket.b { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
+.ks2-bracket.c { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
+.ks2-bracket.d { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+.ks2-hud { position: absolute; z-index: 2; font-family: var(--ks-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--ks-muted); display: grid; gap: 4px; pointer-events: none; }
+.ks2-hud b { color: var(--ks-ink); font-weight: 500; }
+.ks2-hud.tl { top: 22px; left: 24px; }
+.ks2-hud.tr { top: 22px; right: 24px; text-align: right; }
+.ks2-hud.bl { bottom: 22px; left: 24px; }
+.ks2-clock { font-family: var(--ks-display); font-size: 26px; color: var(--ks-ink); letter-spacing: 0.06em; text-shadow: 0 0 18px rgba(168, 85, 247, 0.7); font-variant-numeric: tabular-nums; }
+
+#kira-start-screen .kira-start-shell { position: relative; z-index: 3; }
+#kira-start-screen .kira-start-card {
+  position: relative; width: min(460px, calc(100vw - 32px)) !important; max-width: none !important; height: auto !important; min-height: 0 !important; aspect-ratio: auto !important;
+  padding: 30px 32px 26px !important; border-radius: 28px !important;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.015) 40%), var(--ks-glass) !important;
+  border: 1px solid var(--ks-edge) !important; backdrop-filter: blur(22px) saturate(160%) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 60px rgba(168, 85, 247, 0.18) !important;
+}
+#kira-start-screen .kira-start-card-glow { display: none !important; }
+@property --ks2-spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+/* a borda de luz que gira em volta do vidro */
+#kira-start-screen .kira-start-card-outline {
+  position: absolute !important; inset: -1px !important; border-radius: inherit !important; padding: 1px; pointer-events: none; border: 0 !important; opacity: 1 !important; box-shadow: none !important;
+  background: conic-gradient(from var(--ks2-spin), transparent 0 70%, var(--ks-magenta) 80%, var(--ks-cyan) 88%, transparent 96%) !important;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: ks2-edge 6s linear infinite !important;
+}
+@keyframes ks2-edge { to { --ks2-spin: 360deg; } }
+#kira-start-screen .kira-start-content { display: grid !important; justify-items: center; gap: 14px; text-align: center; }
+
+/* núcleo: rosto da Kira no meio de três anéis girando */
+#kira-start-screen .kira-avatar-container { position: relative; width: 168px !important; height: 168px !important; display: grid; place-items: center; margin: 0 auto !important; }
+#kira-start-screen .energy-ring, #kira-start-screen .energy-particles { display: none !important; }
+.ks2-rings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ks2-r1 { animation: ks2-turn 14s linear infinite; transform-origin: 84px 84px; }
+.ks2-r2 { animation: ks2-turn 9s linear infinite reverse; transform-origin: 84px 84px; }
+.ks2-r3 { animation: ks2-turn 22s linear infinite; transform-origin: 84px 84px; }
+@keyframes ks2-turn { to { transform: rotate(360deg); } }
+#kira-start-screen .kira-avatar {
+  position: relative !important; inset: auto !important; transform: none !important; width: 84px !important; height: 84px !important; border-radius: 50% !important; object-fit: cover;
+  border: 1px solid rgba(240, 171, 252, 0.45) !important; box-shadow: 0 0 34px rgba(168, 85, 247, 0.65) !important; animation: ks2-breathe 3.6s ease-in-out infinite !important;
+}
+@keyframes ks2-breathe { 50% { box-shadow: 0 0 54px rgba(168, 85, 247, 0.9); } }
+
+#kira-start-screen .kira-start-label { font-family: var(--ks-mono) !important; font-size: 11px !important; letter-spacing: 0.32em !important; color: var(--ks-muted) !important; text-shadow: none !important; }
+#kira-start-screen .kira-start-title {
+  margin: -4px 0 0 !important; padding-left: 0.34em; line-height: 1 !important; font-family: var(--ks-display) !important; font-weight: 700 !important;
+  font-size: clamp(44px, 6vw, 64px) !important; letter-spacing: 0.34em !important; text-shadow: none !important;
+  background: linear-gradient(180deg, #fff, #d8c4ff 55%, #a78bfa) !important; -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+  filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.65));
+}
+.ks2-voice { display: flex; align-items: end; gap: 3px; height: 22px; }
+.ks2-voice i { width: 3px; border-radius: 2px; background: linear-gradient(var(--ks-cyan), var(--ks-violet)); animation: ks2-bar 1.1s ease-in-out infinite; }
+@keyframes ks2-bar { 0%, 100% { height: 4px; } 50% { height: 20px; } }
+
+.ks2-systems { box-sizing: border-box; width: 100%; display: grid; gap: 7px; padding: 12px 14px; border-radius: 16px; background: rgba(5, 3, 12, 0.45);
+  border: 1px solid rgba(196, 160, 255, 0.14); font-family: var(--ks-mono); font-size: 12px; text-align: left; }
+.ks2-sys { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; color: var(--ks-muted); }
+.ks2-sys span:last-child { color: var(--ks-warn); display: inline-flex; align-items: center; gap: 6px; }
+.ks2-sys span:last-child::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.ks2-sys.ok span:last-child { color: var(--ks-ok); }
+.ks2-sys.bad span:last-child { color: var(--ks-bad); }
+
+#kira-start-screen .kira-token-status { font-family: var(--ks-mono) !important; font-size: 11px !important; letter-spacing: 0.12em; color: var(--ks-muted) !important; text-transform: uppercase; }
+#kira-start-screen .kira-start-dynamic { width: 100%; }
+#kira-start-screen .kira-start-button {
+  position: relative; overflow: hidden; width: 100% !important; padding: 16px 20px !important; border-radius: 16px !important; border: 1px solid rgba(240, 171, 252, 0.55) !important;
+  font-family: var(--ks-display) !important; font-weight: 600 !important; font-size: 16px !important; letter-spacing: 0.32em !important; color: #fff !important;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.85), rgba(192, 38, 211, 0.75)) !important;
+  box-shadow: 0 0 28px rgba(168, 85, 247, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important; transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s !important;
+}
+#kira-start-screen .kira-start-button-glow { display: none !important; }
+#kira-start-screen .kira-start-button::after { content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%); animation: ks2-sweep 2.8s ease-in-out infinite; }
+@keyframes ks2-sweep { 60%, 100% { transform: translateX(100%); } }
+#kira-start-screen .kira-start-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 44px rgba(240, 171, 252, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important; }
+#kira-start-screen .kira-start-button:focus-visible { outline: 2px solid var(--ks-cyan); outline-offset: 3px; }
+#kira-start-screen .kira-start-button:disabled { opacity: 0.45 !important; cursor: wait; }
+#kira-start-screen .kira-start-button:disabled::after { animation: none; }
+#kira-start-screen .kira-start-loading-text, #kira-start-screen .kira-start-status { font-family: var(--ks-mono) !important; color: var(--ks-muted) !important; letter-spacing: 0.08em; }
+#kira-start-screen .kira-progress-fill { background: linear-gradient(90deg, var(--ks-cyan), var(--ks-violet), var(--ks-magenta)) !important; box-shadow: 0 0 10px var(--ks-violet) !important; }
+
+@media (max-width: 640px) {
+  .ks2-hud.tl, .ks2-hud.bl, .ks2-bracket { display: none; }
+  .ks2-hud.tr { right: 16px; }
+  #kira-start-screen .kira-start-card { padding: 24px 18px 20px !important; }
+}
+/* o Windows do Chefe está com "mostrar animações" desligado; ele quer as animações da Kira: não seguimos o reduced-motion aqui */

@@ -1,0 +1,63 @@
+fastapi
+google-genai
+httpx>=0.27.0
+livekit-agents[google]~=1.4
+livekit-api~=1.1
+livekit-plugins-noise-cancellation~=0.2
+mem0ai
+numpy==1.26.4
+openpyxl
+Pillow
+opencv-python==4.10.0.84
+playwright
+pygame>=2.6
+PySide6
+dxcam>=0.0.5
+pyautogui
+pygetwindow
+pywinauto>=0.6.8
+psutil>=5.9
+comtypes>=1.4
+python-dotenv
+requests>=2.31.0
+reportlab
+SQLAlchemy>=2.0
+APScheduler>=3.10
+aiomonitor
+sentry-sdk
+uvicorn[standard]
+pywebview==6.1
+qtpy>=2.4.0
+noisereduce>=3.0.0
+scipy>=1.11.0
+torch>=2.0.0
+torchaudio>=2.0.0
+# Reconhecimento de voz (quem está falando): TitaNet em models/speaker/nemo_en_titanet_small.onnx
+sherpa-onnx==1.13.8
+# Downloads de vídeo (motor do yoinks): ffmpeg embutido e impersonation para sites que exigem.
+yt-dlp
+yt-dlp-ejs
+imageio-ffmpeg
+# QR code do link do celular (Configurações > Celular).
+segno==1.6.6
+curl_cffi
+soundfile>=0.12.0
+# Céu (ISS, satélites, Starlink, lixo espacial): órbitas do CelesTrak calculadas localmente.
+skyfield==1.53
+# Manchetes por RSS, leitura de matéria e cotações.
+feedparser==6.0.11
+trafilatura==2.0.0
+yfinance==0.2.65
+pandas==2.2.3
+# Câmera (olhar, vigia, gestos): MediaPipe na CPU.
+mediapipe==0.10.35
+# Cérebro (memória por significado e documentos): Qdrant local; modelo ONNX lido com onnxruntime e tokenizers.
+qdrant-client==1.20.0
+onnxruntime==1.19.2
+tokenizers==0.22.2
+pypdf==6.9.1
+python-docx==1.2.0
+# Notificação no app da Kira do celular (Web Push). Instaladas com --no-deps: o pywebpush pediria cryptography 50.
+pywebpush==2.5.0
+py-vapid==1.9.6
+http_ece==1.2.1

@@ -1,0 +1,417 @@
+/* Configurações e WhatsApp: o mesmo estilo nas abas Áudio, Aparência e Kira e na janela do WhatsApp. Cartões sem borda:
+   cada um na sua cor, com uma linha de luz no alto (desenhada ao abrir). Um tamanho só para todas as abas e pintura
+   barata: nesta máquina a CPU desenha a tela (sombras grandes, blur e degradês radiais custavam até 1,5 s de raster ao
+   abrir, 2026-10-24) e a placa de vídeo (Fermi, na lista negra do Chromium) derruba a Kira com muita camada animada:
+   o reflexo que passava em cada cartão e o brilho animado do mouse saíram depois de uma queda (D99). */
+:is(#config-drawer, #whatsapp-drawer) {
+  --ks-bg: rgba(9, 6, 20, 0.82);
+  --ks-line: rgba(168, 85, 247, 0.2);
+  --ks-text: #ece4ff;
+  --ks-muted: rgba(196, 181, 253, 0.6);
+}
+#config-drawer.side-drawer {
+  height: min(640px, calc(100vh - 40px)) !important;
+  max-height: none !important;
+  background: #0a0718 !important;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.16), 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+}
+#config-drawer .drawer-header { padding: 12px 20px 10px !important; background: linear-gradient(90deg, rgba(88, 28, 135, 0.42), transparent 70%); }
+#config-drawer .drawer-header::before { width: 32px !important; height: 32px !important; }
+#config-drawer .config-tabs { margin: 0 0 10px !important; }
+#config-drawer .config-tab-btn { min-height: 34px !important; padding: 7px 14px !important; }
+#config-drawer .drawer-body { padding: 10px 18px 12px !important; }
+#config-drawer .drawer-body { display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+#config-drawer .config-modal-stack { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+#config-drawer .config-tab-panel:not([hidden]) { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; color: var(--ks-text); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 2px 4px 2px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.35) transparent;
+}
+
+/* Faixa de cima: cidade (caixa pequena) e resumo em pílulas. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 250px;
+  max-width: 100%;
+  padding: 4px 4px 4px 10px;
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 999px;
+  background: rgba(6, 16, 24, 0.75);
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location:focus-within { border-color: rgba(103, 232, 249, 0.8); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location .kira-settings-icon { width: 15px; height: 15px; stroke: #67e8f9; flex: 0 0 auto; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ks-text); font: inherit; font-size: 0.78rem; font-weight: 600; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location-input::placeholder { color: var(--ks-muted); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location-save { border: 0; border-radius: 999px; padding: 4px 10px; background: rgba(34, 211, 238, 0.18); color: #a5f3fc; font: inherit; font-size: 0.68rem; font-weight: 800; cursor: pointer; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-location-save:hover { background: rgba(34, 211, 238, 0.32); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(168, 85, 247, 0.26);
+  border-radius: 999px;
+  background: rgba(14, 9, 30, 0.8);
+  font-family: 'Orbitron', var(--font-ui, sans-serif);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ks-muted);
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-pill b { color: var(--ks-text); font-weight: 700; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-summary-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-summary-dot.is-off { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+
+/* Kira: três colunas fixas. Áudio e Aparência: grade de 2 colunas. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: stretch; min-height: 100%; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-col > .kira-settings-card { margin: 0; }
+/* o último cartão de cada coluna estica: as três colunas terminam na mesma linha */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-col > .kira-settings-card:last-child { flex: 1 1 auto; }
+/* Áudio: três colunas e duas linhas do mesmo tamanho ocupando a aba inteira. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; min-height: 100%; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-3 > .kira-settings-card { margin: 0; }
+/* Aparência: Orbe, Fundo e Mini player em cima; Cor e movimento, Galáxia e Animações embaixo, enchendo a aba. Sem a
+   galáxia (orbe círculo ou partículas) a segunda linha fica com dois cartões largos. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-look { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 100%; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-look > .kira-settings-card { grid-column: span 2; margin: 0; }
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) #config-panel-visual .kira-settings-grid-look > .kira-settings-card:nth-child(n + 4) { grid-column: span 3; }
+/* Troca de aba: o conteúdo novo sobe um pouco ao aparecer (uma camada só). */
+#config-drawer .config-tab-panel.is-tab-enter { animation: kira-tab-in calc(240ms * var(--kira-anim-speed, 1)) cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes kira-tab-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+html[data-kira-motion="off"] #config-drawer .config-tab-panel.is-tab-enter { animation: none; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-card {
+  --card-accent: #a855f7;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  break-inside: avoid;
+  margin: 0 0 12px;
+  padding: 12px 12px 10px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--card-accent) 14%, transparent), transparent 70px),
+    rgba(14, 10, 30, 0.9);
+  overflow: hidden;
+}
+/* A linha de luz: forte perto do ícone, some para a direita. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--card-accent) 10%, color-mix(in srgb, var(--card-accent) 45%, #fff) 24%,
+    color-mix(in srgb, var(--card-accent) 40%, transparent) 72%, transparent);
+  transform-origin: left center;
+  pointer-events: none;
+}
+/* Só na primeira vez que a aba monta: depois a troca de aba é imediata (antes refazia tudo e animava de novo). */
+:is(#config-drawer, #whatsapp-drawer) .is-first-render .kira-settings-card { animation: kira-settings-in 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+:is(#config-drawer, #whatsapp-drawer) .is-first-render .kira-settings-card::before { animation: kira-line-draw 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 45ms + 120ms); }
+@keyframes kira-settings-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes kira-line-draw {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+html[data-kira-motion="off"] :is(#config-drawer, #whatsapp-drawer) .kira-settings-card,
+html[data-kira-motion="off"] :is(#config-drawer, #whatsapp-drawer) .kira-settings-card::before { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-kira-motion="system"] :is(#config-drawer, #whatsapp-drawer) .kira-settings-card,
+  html[data-kira-motion="system"] :is(#config-drawer, #whatsapp-drawer) .kira-settings-card::before { animation: none; }
+}
+
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-head { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 10px; margin-bottom: 8px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-icon { width: 17px; height: 17px; fill: none; stroke: var(--card-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* No cabeçalho o ícone fica num quadradinho iluminado na cor da seção, ao lado do título e da linha de ajuda. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-head > .kira-settings-icon {
+  grid-row: span 2;
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--card-accent) 18%, transparent);
+  stroke: color-mix(in srgb, var(--card-accent) 60%, #fff);
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-title {
+  margin: 0;
+  font-family: 'Orbitron', var(--font-ui, sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--card-accent) 55%, #fff);
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-sub { grid-column: 2; margin: 2px 0 0; font-size: 0.65rem; color: var(--ks-muted); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-body { display: flex; flex-direction: column; gap: 6px; }
+/* rótulo à esquerda e a escolha à direita, numa linha só (ex.: "Quantas notícias  3 4 6") */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* Linhas compactas: rótulo, ajuda de uma linha, chave à direita. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.025); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-row:hover { background: rgba(255, 255, 255, 0.05); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-row-text { min-width: 0; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-label { font-size: 0.75rem; font-weight: 700; color: var(--ks-text); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-help { font-size: 0.64rem; line-height: 1.35; color: var(--ks-muted); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-body > .kira-settings-label { margin-top: 2px; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ks-muted); }
+
+:is(#config-drawer, #whatsapp-drawer) .kira-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+  background: rgba(30, 27, 46, 0.9);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #cbd5e1; transition: transform 0.2s, background-color 0.2s; }
+:is(#config-drawer, #whatsapp-drawer) .kira-switch.enabled { border-color: color-mix(in srgb, var(--card-accent) 70%, transparent); background: color-mix(in srgb, var(--card-accent) 38%, #0b0716); }
+:is(#config-drawer, #whatsapp-drawer) .kira-switch.enabled::after { transform: translateX(16px); background: #fff; }
+:is(#config-drawer, #whatsapp-drawer) .kira-switch:focus-visible,
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-button:focus-visible,
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-chip:focus-visible { outline: 2px solid var(--card-accent, #d8b4fe); outline-offset: 2px; }
+
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-inline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-quiet { padding-left: 8px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-field {
+  width: auto;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--card-accent, #a855f7) 40%, transparent);
+  border-radius: 8px 8px 3px 3px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--ks-text);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 0.74rem;
+  outline: none;
+  color-scheme: dark;
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-field:focus { border-bottom-color: color-mix(in srgb, var(--card-accent, #a855f7) 85%, #fff); background: rgba(255, 255, 255, 0.07); }
+#config-drawer select.kira-settings-field { width: 100%; min-width: 0; text-overflow: ellipsis; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-grow { flex: 1; min-width: 120px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-time { width: 82px; padding: 5px 6px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-nowrap { flex-wrap: nowrap; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-quiet { flex-wrap: nowrap; }
+
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-chip,
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-button {
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--card-accent, #a855f7) 15%, rgba(255, 255, 255, 0.03));
+  color: #efe7ff;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-chip.active { background: color-mix(in srgb, var(--card-accent, #a855f7) 48%, #0b0716); color: #fff; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--card-accent, #a855f7) 70%, #fff); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-button:hover,
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-chip:hover { background: color-mix(in srgb, var(--card-accent, #a855f7) 30%, rgba(255, 255, 255, 0.04)); }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-icon-button { padding: 4px 9px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-shortcut-capture { min-width: 74px; font-variant-numeric: tabular-nums; }
+:is(#config-drawer, #whatsapp-drawer) .kira-shortcut-status { color: color-mix(in srgb, var(--card-accent) 60%, #fff); }
+:is(#config-drawer, #whatsapp-drawer) .kira-shortcut-status:empty { display: none; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-status { margin-top: 8px; text-align: center; font-size: 0.66rem; color: var(--ks-muted); }
+
+/* Controles deslizantes maiores e na cor do cartão: mais fáceis de pegar com o mouse. */
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-card input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 22px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  cursor: pointer;
+  accent-color: var(--card-accent);
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-card input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, var(--card-accent) var(--slider-fill, 50%), rgba(255, 255, 255, 0.1) var(--slider-fill, 50%)) !important;
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: -6px !important;
+  border: 3px solid #fff !important;
+  border-radius: 50% !important;
+  background: var(--card-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--card-accent) 30%, transparent) !important;
+}
+
+/* Áudio */
+:is(#config-drawer, #whatsapp-drawer) .kira-volume-row { display: flex; align-items: center; gap: 12px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-volume-value { min-width: 64px; font-family: 'Orbitron', var(--font-ui, sans-serif); font-size: 1.15rem; font-weight: 700; text-align: right; color: color-mix(in srgb, var(--card-accent) 45%, #fff); font-variant-numeric: tabular-nums; }
+:is(#config-drawer, #whatsapp-drawer) .kira-mic-meter { position: relative; height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+/* Só o "transform" muda a cada quadro: a barra não é redesenhada, só movida. */
+:is(#config-drawer, #whatsapp-drawer) .kira-mic-meter-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #84cc16 55%, #f59e0b 80%, #ef4444);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 70ms linear;
+  will-change: transform;
+}
+:is(#config-drawer, #whatsapp-drawer) .kira-voice-profiles { display: grid; gap: 6px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-voice-profile { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); }
+:is(#config-drawer, #whatsapp-drawer) .kira-voice-profile b { font-size: 0.78rem; }
+:is(#config-drawer, #whatsapp-drawer) .kira-voice-badge { padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--card-accent) 22%, #0b0716); color: #fff; font-size: 0.62rem; font-weight: 700; }
+
+/* Aparência */
+:is(#config-drawer, #whatsapp-drawer) .kira-slider-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-slider { display: grid; gap: 1px; }
+:is(#config-drawer, #whatsapp-drawer) .kira-slider-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.72rem; font-weight: 700; }
+:is(#config-drawer, #whatsapp-drawer) .kira-slider-head output { color: color-mix(in srgb, var(--card-accent) 50%, #fff); font-variant-numeric: tabular-nums; }
+:is(#config-drawer, #whatsapp-drawer) .kira-settings-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* Sistema (aba Kira): pares nome/valor. */
+:is(#config-drawer, #whatsapp-drawer) .kira-system-list { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0; font-size: 0.72rem; }
+:is(#config-drawer, #whatsapp-drawer) .kira-system-list dt { color: var(--ks-muted); }
+:is(#config-drawer, #whatsapp-drawer) .kira-system-list dd { margin: 0; text-align: right; font-weight: 700; }
+:is(#config-drawer, #whatsapp-drawer) .kira-system-list dd.is-ok { color: #86efac; }
+:is(#config-drawer, #whatsapp-drawer) .kira-system-list dd.is-warn { color: #fcd34d; }
+
+@media (max-width: 900px) {
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-look > .kira-settings-card,
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-grid-look > .kira-settings-card:nth-child(n + 4) { grid-column: span 6; }
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-top { flex-direction: column; align-items: stretch; }
+  :is(#config-drawer, #whatsapp-drawer) .kira-settings-location { width: 100%; }
+}
+
+/* WhatsApp: moldura leve (fundo liso e uma sombra curta, como as Configurações) e os cartões da aba Kira. Grade de três
+   colunas e duas linhas que enche a janela: nada sobra embaixo e as linhas terminam alinhadas. */
+#whatsapp-drawer.side-drawer {
+  height: min(620px, calc(100vh - 40px)) !important;
+  max-height: none !important;
+  background: #0a0718 !important;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.16), 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+}
+#whatsapp-drawer .wpp-body { display: flex; flex-direction: column; min-height: 0; color: var(--ks-text); }
+#whatsapp-drawer .wa-cards { display: flex; flex-direction: column; }
+#whatsapp-drawer .wa-grid { display: grid; flex: 1 1 auto; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 100%; }
+#whatsapp-drawer .wa-grid > .kira-settings-card { margin: 0; }
+#whatsapp-drawer .wa-quick-card { grid-column: span 2; }
+#whatsapp-drawer .wa-quick-layout { display: grid; flex: 1 1 auto; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 12px; align-items: stretch; }
+#whatsapp-drawer .wa-quick-layout > .kira-settings-body { min-height: 0; }
+
+/* Conta: avatar do WhatsApp, quem está conectado e o selo de status. */
+#whatsapp-drawer .wa-account-hero { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: linear-gradient(90deg, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0.02)); }
+#whatsapp-drawer .wa-account-avatar { display: grid; flex: 0 0 auto; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #4ade80, #15803d); }
+#whatsapp-drawer .wa-account-avatar svg { width: 20px; height: 20px; fill: #fff; }
+#whatsapp-drawer .wa-account-who { display: grid; justify-items: start; gap: 4px; min-width: 0; }
+#whatsapp-drawer .wa-account-who b { max-width: 100%; overflow: hidden; font-size: 0.84rem; white-space: nowrap; text-overflow: ellipsis; }
+#whatsapp-drawer .wa-qr-box img { width: 180px; height: 180px; border-radius: 10px; background: #fff; }
+
+/* Hoje */
+#whatsapp-drawer .wa-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#whatsapp-drawer .wa-stats div { display: grid; justify-items: center; gap: 2px; padding: 10px 4px; border-radius: 10px; background: color-mix(in srgb, var(--card-accent) 8%, rgba(255, 255, 255, 0.03)); }
+#whatsapp-drawer .wa-stats b { font-family: 'Orbitron', var(--font-ui, sans-serif); font-size: 1.35rem; color: color-mix(in srgb, var(--card-accent) 50%, #fff); }
+#whatsapp-drawer .wa-stats span { font-size: 0.64rem; color: var(--ks-muted); }
+
+/* Enviar rápido */
+#whatsapp-drawer .wa-quick-text { flex: 1 1 auto; width: 100%; min-height: 64px; box-sizing: border-box; resize: none; }
+#whatsapp-drawer .wa-quick-confirm { display: grid; gap: 6px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--card-accent) 14%, transparent); font-size: 0.72rem; }
+#whatsapp-drawer .wa-quick-confirm[hidden] { display: none; }
+/* Trocando de modo: os botões esperam a resposta. */
+#whatsapp-drawer .kira-settings-chip.mode-disabled { opacity: 0.5; pointer-events: none; }
+
+/* Contatos da Kira: a lista ocupa o espaço do cartão (rola se crescer); clicar escolhe para quem enviar. */
+#whatsapp-drawer .wa-count { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--card-accent) 30%, #0b0716); color: #fff; font-size: 0.6rem; letter-spacing: 0; }
+#whatsapp-drawer .wa-contact-list { display: grid; flex: 1 1 auto; align-content: start; gap: 4px; min-height: 48px; margin-bottom: 8px; overflow-y: auto; scrollbar-width: thin; }
+#whatsapp-drawer .wa-contact-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 9px; background: rgba(255, 255, 255, 0.03); cursor: pointer; }
+#whatsapp-drawer .wa-contact-row:hover,
+#whatsapp-drawer .wa-contact-row:focus-visible { background: color-mix(in srgb, var(--card-accent) 16%, transparent); outline: none; }
+#whatsapp-drawer .wa-contact-avatar { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, #c084fc); color: #fff; font-size: 0.74rem; font-weight: 800; }
+#whatsapp-drawer .wa-contact-text { display: grid; min-width: 0; }
+#whatsapp-drawer .wa-contact-text b { overflow: hidden; font-size: 0.76rem; white-space: nowrap; text-overflow: ellipsis; }
+#whatsapp-drawer .wa-contact-text span { font-size: 0.62rem; color: var(--ks-muted); font-variant-numeric: tabular-nums; }
+#whatsapp-drawer .wa-contact-remove { min-width: 26px; height: 24px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; color: var(--ks-muted); font: inherit; font-size: 0.68rem; font-weight: 700; cursor: pointer; }
+#whatsapp-drawer .wa-contact-remove:hover { background: rgba(244, 63, 94, 0.16); color: #fecdd3; }
+#whatsapp-drawer .wa-contact-remove.is-confirming { background: rgba(244, 63, 94, 0.32); color: #fff; }
+/* Secretária ligada: quantas respondeu hoje e com quem está falando (ponto aceso, sem animação) */
+#whatsapp-drawer .wa-secretary-status { display: flex; align-items: center; gap: 7px; margin-top: 8px; padding: 6px 9px; border-radius: 9px; background: color-mix(in srgb, var(--card-accent) 12%, transparent); font-size: 0.66rem; line-height: 1.3; }
+#whatsapp-drawer .wa-secretary-status[hidden] { display: none; }
+#whatsapp-drawer .wa-secretary-status::before { content: ''; flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--card-accent); box-shadow: 0 0 6px var(--card-accent); }
+#whatsapp-drawer .wa-secretary-status.is-idle::before { background: var(--ks-muted); box-shadow: none; }
+#whatsapp-drawer .wa-contact-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; }
+#whatsapp-drawer .wa-contact-add .kira-settings-field { min-width: 0; }
+@media (max-width: 900px) {
+  #whatsapp-drawer .wa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
+  #whatsapp-drawer .wa-quick-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* WhatsApp · Vidro esmeralda (modelo escolhido em 2026-11): vidro verde-água, selo aceso, botões verdes */
+#whatsapp-drawer { background: linear-gradient(160deg, rgba(74, 222, 128, .14), rgba(6, 40, 30, .72) 35%, rgba(4, 18, 14, .93)) !important; border-color: rgba(134, 239, 172, .4) !important; box-shadow: 0 30px 70px rgba(0, 0, 0, .6), 0 0 44px rgba(34, 197, 94, .25) !important; }
+#whatsapp-drawer .wpp-hdr-icon { background: #22c55e; border-radius: 50%; box-shadow: 0 0 18px #22c55e, 0 0 4px #bbf7d0; }
+#whatsapp-drawer .wpp-hdr-sub, #whatsapp-drawer .kira-settings-title { color: #86efac; }
+#whatsapp-drawer .kira-settings-card { --card-accent: #4ade80 !important; background: rgba(255, 255, 255, .05); border: 1px solid rgba(134, 239, 172, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
+#whatsapp-drawer .kira-settings-icon { color: #4ade80; filter: drop-shadow(0 0 6px rgba(74, 222, 128, .7)); }
+#whatsapp-drawer .wa-stats b { color: #bbf7d0; text-shadow: 0 0 12px rgba(74, 222, 128, .6); }
+#whatsapp-drawer .kira-settings-button { background: #22c55e; color: #022c22; border: 0; border-radius: 99px; font-weight: 700; }
+#whatsapp-drawer .kira-settings-field { background: rgba(0, 0, 0, .3); border-color: rgba(134, 239, 172, .25); }
+#whatsapp-drawer .kira-switch.enabled { background: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, .7); }
+#whatsapp-drawer .wa-contact-avatar { background: linear-gradient(135deg, #22c55e, #0d9488); color: #fff; }
+#whatsapp-drawer .wa-hdr-switch { margin-left: auto; margin-right: 10px; }
+#whatsapp-drawer .kira-settings-head { position: relative; }
+#whatsapp-drawer .wa-more { position: absolute; top: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(134, 239, 172, .3); background: rgba(0, 0, 0, .25); color: #bbf7d0; font: 700 16px/1 system-ui; cursor: pointer; }
+#whatsapp-drawer .wa-contact-add[hidden] { display: none !important; }
+/* ⋮ → telinha "Novo contato" por cima da lista (não mais uma linha apertada embaixo) */
+#whatsapp-drawer .wa-contacts-card { position: relative; }
+#whatsapp-drawer .wa-contacts-card .kira-settings-head { padding-right: 36px; }
+#whatsapp-drawer .wa-contact-add { position: absolute; inset: 56px 12px auto; z-index: 5; display: flex; flex-direction: column; gap: 9px; padding: 14px; border-radius: 14px; background: linear-gradient(160deg, rgba(20, 60, 44, .97), rgba(4, 20, 15, .98)); border: 1px solid rgba(134, 239, 172, .45); box-shadow: 0 18px 40px rgba(0, 0, 0, .65), 0 0 22px rgba(34, 197, 94, .25); }
+#whatsapp-drawer .wa-contact-add .kira-settings-field { width: 100%; min-width: 0; box-sizing: border-box; height: 36px; padding: 0 12px; }
+#whatsapp-drawer .wa-add-title { font: 700 12px "Orbitron", sans-serif; letter-spacing: .12em; color: #86efac; }
+#whatsapp-drawer .wa-add-actions { display: flex; gap: 8px; justify-content: flex-end; }
+#whatsapp-drawer .wa-add-actions .kira-settings-button { min-width: 96px; height: 34px; padding: 0 16px; white-space: nowrap; }
+#whatsapp-drawer .wa-add-cancel { background: rgba(255, 255, 255, .08) !important; color: #d1fae5 !important; border: 1px solid rgba(134, 239, 172, .3) !important; }
+/* Personalidade: 15 controles 0-100 em duas colunas */
+#config-drawer .kira-persona-sliders { display: grid; grid-template-columns: 1fr; gap: 4px; margin: 8px 0; }
+#config-drawer .kira-persona-group { display: grid; gap: 4px; padding: 8px 0; border-top: 1px solid rgba(244,114,182,.16); }
+#config-drawer .kira-persona-group:first-child { border-top: 0; padding-top: 0; }
+#config-drawer .kira-persona-group-title { margin: 0 0 2px; color: #f9a8d4; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+#config-drawer .kira-persona-row { display: grid; grid-template-columns: 110px 1fr 28px; align-items: center; gap: 6px; font-size: 11px; color: #e9d5ff; }
+#config-drawer .kira-persona-row input { width: 100%; accent-color: #f472b6; }
+#config-drawer .kira-persona-row b { text-align: right; font-variant-numeric: tabular-nums; color: #f9a8d4; }
+
+/* Memória: diagnóstico técnico recolhido por padrão */
+.kira-memory-advanced { margin-top: 14px; padding: 10px 14px; border: 1px solid rgba(34, 211, 238, .22); border-radius: 14px; background: rgba(8, 12, 28, .55); }
+.kira-memory-advanced > summary { cursor: pointer; list-style: none; color: #a5f3fc; }
+.kira-memory-advanced > summary::before { content: "▸ "; transition: transform .15s; display: inline-block; }
+.kira-memory-advanced[open] > summary::before { transform: rotate(90deg); }
+.kira-memory-advanced > .kira-memory-grid { margin-top: 12px; }
+
+/* Abas sem área de rolagem própria (Modo econômico, Visual...) eram cortadas pelo overflow:hidden do corpo. */
+#config-drawer .config-tab-panel:not([hidden]):not(:has(.kira-settings-scroll)) { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(139, 92, 246, 0.35) transparent; }
+#config-drawer .config-modal-stack { overflow: hidden; }
+/* Personalidade: o cartão não encolhe (era cortado sem rolagem); a aba rola. */
+#config-panel-personality:not([hidden]) { overflow-y: auto !important; overscroll-behavior: contain; scrollbar-width: thin; }
+#config-panel-personality > * { flex: 0 0 auto !important; overflow: visible !important; }
+
+/* Personalidade por contato (aba WhatsApp) */
+#whatsapp-drawer .wa-contact-mood { flex: 0 0 auto; max-width: 150px; height: 26px; margin-right: 4px; border-radius: 8px; border: 1px solid rgba(134, 239, 172, .35); background: rgba(4, 20, 15, .9); color: #d1fae5; font-size: 11px; }

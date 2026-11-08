@@ -1,0 +1,60 @@
+/* Câmera de segurança (voz desconhecida insistindo), rótulo de quem falou e barra do cadastro de voz. */
+.kira-security-cam {
+  position: fixed;
+  top: 18px;
+  right: 92px;
+  z-index: 9600;
+  width: 340px;
+  overflow: hidden;
+  border: 1px solid rgba(248, 113, 113, 0.7);
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 0 26px rgba(239, 68, 68, 0.45);
+}
+.kira-security-cam[hidden] { display: none; }
+.kira-security-cam-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(60, 6, 12, 0.95);
+  color: #fecaca;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.kira-security-cam-status { margin-left: auto; color: #fff; }
+.kira-security-cam-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: kira-rec-blink 1s steps(2, start) infinite;
+}
+@keyframes kira-rec-blink { to { visibility: hidden; } }
+.kira-security-cam video { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.left-transcription-source-badge.is-unknown-voice { border-color: rgba(248, 113, 113, 0.6); color: #fecaca; }
+
+.kira-voice-enroll {
+  position: fixed;
+  top: 92px;
+  left: 50%;
+  z-index: 9500;
+  width: min(420px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: 12px 16px 14px;
+  border: 1px solid rgba(168, 85, 247, 0.6);
+  border-radius: 14px;
+  background: rgba(10, 6, 22, 0.94);
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.35);
+  color: #f5f3ff;
+}
+.kira-voice-enroll[hidden] { display: none; }
+.kira-voice-enroll-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; }
+.kira-voice-enroll-track { height: 10px; margin: 10px 0 8px; overflow: hidden; border-radius: 999px; background: rgba(168, 85, 247, 0.18); }
+.kira-voice-enroll-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7c3aed, #c084fc); transition: width 0.35s ease; }
+.kira-voice-enroll-hint { min-height: 1.1em; font-size: 0.75rem; opacity: 0.8; }
+.kira-voice-enroll[data-state="salvando"] .kira-voice-enroll-fill,
+.kira-voice-enroll[data-state="salva"] .kira-voice-enroll-fill { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.kira-voice-enroll[data-state="falhou"] { border-color: rgba(248, 113, 113, 0.7); }
+.kira-voice-enroll[data-state="falhou"] .kira-voice-enroll-fill { background: #ef4444; }

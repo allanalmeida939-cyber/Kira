@@ -1,0 +1,396 @@
+/* Olho de Deus, visual novo (2026-10-29): quatro modelos no mesmo padrão da tela de início (vidro, neon, luz e
+   profundidade). O globo, os botões e os painéis são os mesmos de godsEye.js; aqui só muda a aparência.
+   data-ge-theme no .gods-eye escolhe o modelo: nebulosa, artico, aurora, solar. A prévia dos modelos usa este arquivo. */
+
+/* ---------- cores e formas de cada modelo ---------- */
+.gods-eye[data-ge-theme="nebulosa"] {
+  --ge-void: #05030c; --ge-ink: #f3eeff; --ge-muted: #a99bd4; --ge-accent: #a855f7; --ge-accent-2: #f0abfc; --ge-accent-3: #5eead4;
+  --ge-glass: rgba(26, 14, 52, 0.42); --ge-glass-hi: rgba(255, 255, 255, 0.10); --ge-edge: rgba(196, 160, 255, 0.30); --ge-glow: rgba(168, 85, 247, 0.55);
+  --ge-on-bg: linear-gradient(135deg, rgba(124, 58, 237, 0.55), rgba(192, 38, 211, 0.40));
+  --ge-display: "Chakra Petch", "Orbitron", sans-serif; --ge-body: "Sora", "Segoe UI", sans-serif; --ge-mono: "JetBrains Mono", Consolas, monospace;
+  --ge-radius: 18px; --ge-chip-radius: 12px; --ge-blur: 20px;
+  --ge-bg: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(91, 33, 182, 0.30), transparent 70%), radial-gradient(ellipse 120% 90% at 50% 50%, rgba(5, 3, 12, 0.2) 40%, rgba(0, 0, 0, 0.92));
+  --ge-globe-halo: #9d4dff; --ge-globe-grid: #a855f7; --ge-globe-stars: #d8c8ff;
+}
+.gods-eye[data-ge-theme="artico"] {
+  --ge-void: #02070c; --ge-ink: #effbff; --ge-muted: #8fb7c7; --ge-accent: #22d3ee; --ge-accent-2: #e0f7ff; --ge-accent-3: #60a5fa;
+  --ge-glass: rgba(6, 22, 34, 0.46); --ge-glass-hi: rgba(224, 247, 255, 0.10); --ge-edge: rgba(125, 211, 252, 0.34); --ge-glow: rgba(34, 211, 238, 0.50);
+  --ge-on-bg: linear-gradient(90deg, rgba(34, 211, 238, 0.30), rgba(34, 211, 238, 0.06));
+  --ge-display: "JetBrains Mono", Consolas, monospace; --ge-body: "Sora", "Segoe UI", sans-serif; --ge-mono: "JetBrains Mono", Consolas, monospace;
+  --ge-radius: 4px; --ge-chip-radius: 3px; --ge-blur: 16px;
+  --ge-bg: radial-gradient(ellipse 65% 55% at 50% 50%, rgba(8, 145, 178, 0.22), transparent 70%), radial-gradient(ellipse 120% 90% at 50% 50%, rgba(2, 7, 12, 0.2) 40%, rgba(0, 0, 0, 0.94));
+  --ge-globe-halo: #38bdf8; --ge-globe-grid: #67e8f9; --ge-globe-stars: #e0f7ff;
+}
+.gods-eye[data-ge-theme="aurora"] {
+  --ge-void: #03090a; --ge-ink: #effff8; --ge-muted: #94c8b8; --ge-accent: #34d399; --ge-accent-2: #a78bfa; --ge-accent-3: #2dd4bf;
+  --ge-glass: rgba(10, 30, 32, 0.40); --ge-glass-hi: rgba(255, 255, 255, 0.12); --ge-edge: rgba(110, 231, 183, 0.30); --ge-glow: rgba(52, 211, 153, 0.45);
+  --ge-on-bg: linear-gradient(120deg, rgba(16, 185, 129, 0.50), rgba(139, 92, 246, 0.45));
+  --ge-display: "Sora", "Segoe UI", sans-serif; --ge-body: "Sora", "Segoe UI", sans-serif; --ge-mono: "JetBrains Mono", Consolas, monospace;
+  --ge-radius: 26px; --ge-chip-radius: 999px; --ge-blur: 28px;
+  --ge-bg: radial-gradient(ellipse 60% 45% at 30% 20%, rgba(16, 185, 129, 0.20), transparent 70%), radial-gradient(ellipse 60% 45% at 75% 85%, rgba(139, 92, 246, 0.20), transparent 70%), radial-gradient(ellipse 120% 90% at 50% 50%, rgba(3, 9, 10, 0.2) 40%, rgba(0, 0, 0, 0.92));
+  --ge-globe-halo: #2dd4bf; --ge-globe-grid: #6ee7b7; --ge-globe-stars: #d1fae5;
+}
+.gods-eye[data-ge-theme="solar"] {
+  --ge-void: #0a0502; --ge-ink: #fff7ed; --ge-muted: #d6a77a; --ge-accent: #f59e0b; --ge-accent-2: #fde68a; --ge-accent-3: #ef4444;
+  --ge-glass: rgba(36, 18, 6, 0.50); --ge-glass-hi: rgba(255, 237, 213, 0.08); --ge-edge: rgba(251, 191, 36, 0.36); --ge-glow: rgba(245, 158, 11, 0.50);
+  --ge-on-bg: repeating-linear-gradient(-45deg, rgba(245, 158, 11, 0.34) 0 8px, rgba(245, 158, 11, 0.20) 8px 16px);
+  --ge-display: "Chakra Petch", "Orbitron", sans-serif; --ge-body: "Chakra Petch", "Segoe UI", sans-serif; --ge-mono: "JetBrains Mono", Consolas, monospace;
+  --ge-radius: 2px; --ge-chip-radius: 2px; --ge-blur: 14px;
+  --ge-bg: radial-gradient(ellipse 65% 55% at 50% 50%, rgba(180, 83, 9, 0.22), transparent 70%), radial-gradient(ellipse 120% 90% at 50% 50%, rgba(10, 5, 2, 0.2) 40%, rgba(0, 0, 0, 0.94));
+  --ge-globe-halo: #f59e0b; --ge-globe-grid: #fbbf24; --ge-globe-stars: #ffedd5;
+}
+
+/* ---------- base comum (vidro, luz, profundidade) ---------- */
+.gods-eye[data-ge-theme] { background: var(--ge-bg); color: var(--ge-ink); font-family: var(--ge-body); animation: none; }
+.gods-eye[data-ge-theme]::after { background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px); z-index: 5; }
+/* vinheta e cantos da tela, como na tela de início */
+.gods-eye[data-ge-theme]::before {
+  content: ""; position: absolute; inset: 12px; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(var(--ge-edge), var(--ge-edge)) top left / 56px 1px no-repeat, linear-gradient(var(--ge-edge), var(--ge-edge)) top left / 1px 56px no-repeat,
+    linear-gradient(var(--ge-edge), var(--ge-edge)) top right / 56px 1px no-repeat, linear-gradient(var(--ge-edge), var(--ge-edge)) top right / 1px 56px no-repeat,
+    linear-gradient(var(--ge-edge), var(--ge-edge)) bottom left / 56px 1px no-repeat, linear-gradient(var(--ge-edge), var(--ge-edge)) bottom left / 1px 56px no-repeat,
+    linear-gradient(var(--ge-edge), var(--ge-edge)) bottom right / 56px 1px no-repeat, linear-gradient(var(--ge-edge), var(--ge-edge)) bottom right / 1px 56px no-repeat;
+}
+
+/* vidro: fundo translúcido + reflexo no topo + borda de luz + sombra funda */
+.gods-eye[data-ge-theme] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place) {
+  background: linear-gradient(160deg, var(--ge-glass-hi), rgba(255, 255, 255, 0.01) 42%), var(--ge-glass);
+  border: 1px solid var(--ge-edge);
+  backdrop-filter: blur(var(--ge-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--ge-blur)) saturate(160%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 40px color-mix(in srgb, var(--ge-glow) 40%, transparent);
+}
+
+.gods-eye[data-ge-theme] .gods-eye-head {
+  top: 18px; left: 22px; right: 22px; padding: 10px 12px 10px 20px; border-radius: var(--ge-radius); gap: 16px;
+}
+.gods-eye[data-ge-theme] .gods-eye-title {
+  font-family: var(--ge-display); font-weight: 700; font-size: 1.02rem; letter-spacing: 0.34em; text-shadow: none;
+  background: linear-gradient(180deg, #fff, var(--ge-accent-2) 60%, var(--ge-accent)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 10px var(--ge-glow));
+}
+/* ponto "ao vivo" pulsando antes da hora */
+.gods-eye[data-ge-theme] .gods-eye-clock { font-family: var(--ge-mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--ge-muted); opacity: 1; display: inline-flex; align-items: center; gap: 8px; }
+.gods-eye[data-ge-theme] .gods-eye-clock::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ge-accent-3); box-shadow: 0 0 10px var(--ge-accent-3); animation: ge-live 1.6s ease-in-out infinite;
+}
+@keyframes ge-live { 50% { opacity: 0.25; transform: scale(0.7); } }
+.gods-eye[data-ge-theme] .gods-eye-close {
+  width: 36px; height: 36px; border-radius: calc(var(--ge-radius) * 0.6 + 4px); border: 1px solid var(--ge-edge); background: rgba(255, 255, 255, 0.04); color: var(--ge-ink);
+  font-size: 1.15rem; line-height: 1; transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+.gods-eye[data-ge-theme] .gods-eye-close:hover { transform: rotate(90deg) scale(1.06); background: color-mix(in srgb, var(--ge-accent) 30%, transparent); box-shadow: 0 0 22px var(--ge-glow); }
+
+/* painel das camadas: vidro com título, botões que crescem quando ligados */
+.gods-eye[data-ge-theme] .gods-eye-layers {
+  left: 22px; bottom: 22px; gap: 5px; padding: 34px 10px 10px; border-radius: var(--ge-radius); max-height: calc(100% - 120px); overflow-y: auto; scrollbar-width: none;
+}
+.gods-eye[data-ge-theme] .gods-eye-layers::-webkit-scrollbar { display: none; }
+.gods-eye[data-ge-theme] .gods-eye-layers::before {
+  content: "CAMADAS"; position: absolute; top: 12px; left: 16px; font-family: var(--ge-mono); font-size: 0.62rem; letter-spacing: 0.3em; color: var(--ge-muted);
+}
+.gods-eye[data-ge-theme] .gods-eye-chip {
+  position: relative; overflow: hidden; min-width: 196px; padding: 7px 12px 7px 26px; border-radius: var(--ge-chip-radius);
+  border: 1px solid transparent; background: rgba(255, 255, 255, 0.025); color: var(--ge-muted);
+  font-family: var(--ge-body); font-size: 0.72rem; letter-spacing: 0.04em;
+  transition: padding 0.35s cubic-bezier(.2, 1.3, .4, 1), min-width 0.35s cubic-bezier(.2, 1.3, .4, 1), color 0.25s, background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+/* luz de estado à esquerda */
+.gods-eye[data-ge-theme] .gods-eye-chip::before {
+  content: ""; position: absolute; left: 11px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%;
+  background: color-mix(in srgb, var(--ge-muted) 40%, transparent); transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+/* brilho que passa pelo botão ligado */
+.gods-eye[data-ge-theme] .gods-eye-chip::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-110%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+}
+.gods-eye[data-ge-theme] .gods-eye-chip:hover { color: var(--ge-ink); background: rgba(255, 255, 255, 0.06); border-color: var(--ge-edge); transform: translateX(3px); }
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on {
+  min-width: 222px; padding-left: 30px; color: #fff; background: var(--ge-on-bg); border-color: color-mix(in srgb, var(--ge-accent-2) 70%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--ge-glow) 70%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on::before { background: var(--ge-accent-2); box-shadow: 0 0 10px var(--ge-accent-2), 0 0 18px var(--ge-accent); transform: scale(1.25); }
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on::after { animation: ge-sweep 3.2s ease-in-out infinite; }
+@keyframes ge-sweep { 55%, 100% { transform: translateX(110%); } }
+.gods-eye[data-ge-theme] .gods-eye-chip.ge-grow { animation: ge-press 0.45s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes ge-press { 0% { transform: scale(0.94); } 60% { transform: scale(1.04); } 100% { transform: none; } }
+.gods-eye[data-ge-theme] :is(.gods-eye-chip, .gods-eye-close, .gods-eye-place-close):focus-visible { outline: 2px solid var(--ge-accent-2); outline-offset: 2px; }
+
+/* painel de detalhes: cresce do canto quando o conteúdo muda */
+.gods-eye[data-ge-theme] .gods-eye-info {
+  right: 22px; bottom: 22px; min-width: 240px; max-width: 340px; padding: 14px 18px; border-radius: var(--ge-radius);
+  font-family: var(--ge-body); font-size: 0.8rem; line-height: 1.55; color: var(--ge-ink); transform-origin: bottom right;
+}
+.gods-eye[data-ge-theme] .gods-eye-info strong { color: var(--ge-accent-2); font-family: var(--ge-display); letter-spacing: 0.08em; margin-bottom: 2px; text-shadow: 0 0 12px var(--ge-glow); }
+.gods-eye[data-ge-theme] .gods-eye-info div { color: var(--ge-muted); }
+.gods-eye[data-ge-theme] .gods-eye-info.ge-grow, .gods-eye[data-ge-theme] .gods-eye-place.ge-grow { animation: ge-grow 0.55s cubic-bezier(.2, 1.25, .35, 1); }
+@keyframes ge-grow {
+  0% { opacity: 0; transform: scale(0.82) translateY(10px); clip-path: inset(40% 0 40% 0 round var(--ge-radius)); }
+  60% { opacity: 1; clip-path: inset(0 0 0 0 round var(--ge-radius)); }
+  100% { opacity: 1; transform: none; clip-path: inset(0 0 0 0 round var(--ge-radius)); }
+}
+.gods-eye[data-ge-theme] .gods-eye-hint { font-family: var(--ge-mono); font-size: 0.64rem; letter-spacing: 0.06em; color: var(--ge-muted); opacity: 0.8; }
+
+/* cartão do lado (lugar, asteroides, foto do dia) */
+.gods-eye[data-ge-theme] .gods-eye-place { top: 86px; right: 22px; padding: 14px; border-radius: var(--ge-radius); color: var(--ge-ink); font-family: var(--ge-body); transform-origin: top right; }
+.gods-eye[data-ge-theme] .gods-eye-place-title { font-family: var(--ge-display); color: #fff; letter-spacing: 0.04em; padding-right: 30px; }
+.gods-eye[data-ge-theme] .gods-eye-place-line { color: var(--ge-muted); padding: 5px 0; border-top: 1px solid color-mix(in srgb, var(--ge-edge) 45%, transparent); }
+.gods-eye[data-ge-theme] .gods-eye-place-credit { color: var(--ge-accent); font-family: var(--ge-mono); }
+.gods-eye[data-ge-theme] .gods-eye-place-photo { border-radius: calc(var(--ge-radius) * 0.6); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.gods-eye[data-ge-theme] .gods-eye-place-close { border-color: var(--ge-edge); background: rgba(255, 255, 255, 0.05); color: var(--ge-ink); border-radius: calc(var(--ge-radius) * 0.5 + 4px); transition: transform 0.25s; }
+.gods-eye[data-ge-theme] .gods-eye-place-close:hover { transform: rotate(90deg); }
+
+/* mira da viagem e pino do mapa nas cores do modelo */
+.gods-eye[data-ge-theme] .gods-eye-hud-reticle { border-color: color-mix(in srgb, var(--ge-accent-2) 60%, transparent); box-shadow: 0 0 30px var(--ge-glow), inset 0 0 30px color-mix(in srgb, var(--ge-glow) 50%, transparent); }
+.gods-eye[data-ge-theme] .gods-eye-hud-reticle::after { border-color: var(--ge-accent-3); }
+.gods-eye[data-ge-theme] .gods-eye-hud-sweep { background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--ge-accent) 14%, transparent) 48%, color-mix(in srgb, var(--ge-accent-2) 40%, transparent) 50%, transparent 52%); background-size: 100% 220%; }
+.gods-eye[data-ge-theme] .gods-eye-hud-text { border-color: var(--ge-edge); background: var(--ge-glass); backdrop-filter: blur(14px); font-family: var(--ge-mono); color: var(--ge-ink); border-radius: calc(var(--ge-radius) * 0.6); }
+.gods-eye[data-ge-theme] .gods-eye-hud-text strong { color: var(--ge-accent-3); }
+.gods-eye[data-ge-theme] .gods-eye-pin span { background: var(--ge-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ge-accent) 35%, transparent), 0 0 18px var(--ge-glow); }
+.gods-eye[data-ge-theme] .gods-eye-map .gods-eye-pin-label { border-color: var(--ge-accent); font-family: var(--ge-body); }
+
+/* ---------- ativação: anéis, varredura, nome; depois os painéis entram um a um ---------- */
+.gods-eye-boot { display: none; }
+.gods-eye[data-ge-theme] .gods-eye-boot {
+  display: grid; place-items: center; position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; visibility: hidden;
+}
+.gods-eye[data-ge-theme].is-booting .gods-eye-boot { visibility: visible; animation: ge-boot-fade 2.6s ease forwards; }
+@keyframes ge-boot-fade { 0% { opacity: 0; } 8% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+.gods-eye-boot-ring { position: absolute; border-radius: 50%; border: 1px solid var(--ge-edge); }
+.gods-eye-boot-ring.r1 { width: min(62vmin, 520px); aspect-ratio: 1; border-top-color: var(--ge-accent-2); border-bottom-color: var(--ge-accent); box-shadow: 0 0 40px var(--ge-glow), inset 0 0 40px color-mix(in srgb, var(--ge-glow) 40%, transparent); }
+.gods-eye-boot-ring.r2 { width: min(48vmin, 400px); aspect-ratio: 1; border-style: dashed; border-color: color-mix(in srgb, var(--ge-accent-3) 60%, transparent); }
+.gods-eye-boot-ring.r3 { width: min(76vmin, 640px); aspect-ratio: 1; border-width: 2px; border-color: transparent; border-left-color: var(--ge-accent); border-right-color: var(--ge-accent-3); filter: drop-shadow(0 0 8px var(--ge-glow)); }
+.is-booting .gods-eye-boot-ring.r1 { animation: ge-ring-in 1.4s cubic-bezier(.2, 1, .3, 1) both, ge-spin 3s linear infinite; }
+.is-booting .gods-eye-boot-ring.r2 { animation: ge-ring-in 1.6s 0.1s cubic-bezier(.2, 1, .3, 1) both, ge-spin 2.2s linear infinite reverse; }
+.is-booting .gods-eye-boot-ring.r3 { animation: ge-ring-in 1.8s 0.2s cubic-bezier(.2, 1, .3, 1) both, ge-spin 4s linear infinite; }
+@keyframes ge-ring-in { from { opacity: 0; scale: 0.2; } to { opacity: 1; scale: 1; } }
+@keyframes ge-spin { to { rotate: 360deg; } }
+.gods-eye-boot-scan { position: absolute; left: 0; right: 0; height: 2px; top: 0; background: linear-gradient(90deg, transparent, var(--ge-accent-2), transparent); box-shadow: 0 0 24px 4px var(--ge-glow); opacity: 0; }
+.is-booting .gods-eye-boot-scan { animation: ge-scan 1.6s 0.2s cubic-bezier(.6, 0, .4, 1) both; }
+@keyframes ge-scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+.gods-eye-boot-text { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.gods-eye-boot-text strong {
+  font-family: var(--ge-display); font-weight: 700; font-size: clamp(26px, 4.4vw, 48px); letter-spacing: 0.42em; padding-left: 0.42em;
+  background: linear-gradient(180deg, #fff, var(--ge-accent-2) 60%, var(--ge-accent)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 18px var(--ge-glow));
+}
+.gods-eye-boot-text span { font-family: var(--ge-mono); font-size: 0.7rem; letter-spacing: 0.34em; color: var(--ge-muted); }
+.gods-eye-boot-text i { display: block; width: 200px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--ge-edge) 50%, transparent); overflow: hidden; position: relative; }
+.gods-eye-boot-text i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ge-accent-3), var(--ge-accent), var(--ge-accent-2)); box-shadow: 0 0 10px var(--ge-glow); transform-origin: left; }
+.is-booting .gods-eye-boot-text strong { animation: ge-title-in 1.2s 0.25s cubic-bezier(.2, 1, .3, 1) both; }
+.is-booting .gods-eye-boot-text span { animation: ge-fade-up 0.8s 0.6s ease both; }
+.is-booting .gods-eye-boot-text i::after { animation: ge-bar 1.4s 0.5s cubic-bezier(.6, 0, .3, 1) both; }
+@keyframes ge-title-in { from { opacity: 0; letter-spacing: 1.1em; filter: blur(8px) drop-shadow(0 0 18px var(--ge-glow)); } to { opacity: 1; } }
+@keyframes ge-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ge-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* o globo aparece por trás dos anéis (a câmera vem de longe no godsEye.js) e os painéis entram em sequência */
+.gods-eye[data-ge-theme].is-booting .gods-eye-stage { animation: ge-stage-in 1.8s 0.3s ease both; }
+@keyframes ge-stage-in { from { opacity: 0; filter: brightness(2.2) saturate(0.4); } to { opacity: 1; filter: none; } }
+.gods-eye[data-ge-theme].is-booting .gods-eye-head { animation: ge-drop 0.8s 1.5s cubic-bezier(.2, 1.2, .3, 1) both; }
+@keyframes ge-drop { from { opacity: 0; transform: translateY(-24px) scaleX(0.6); } to { opacity: 1; transform: none; } }
+.gods-eye[data-ge-theme].is-booting .gods-eye-layers { animation: ge-panel-in 0.7s 1.6s cubic-bezier(.2, 1.2, .3, 1) both; transform-origin: bottom left; }
+@keyframes ge-panel-in { from { opacity: 0; transform: scale(0.6); clip-path: inset(100% 0 0 0 round var(--ge-radius)); } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0 round var(--ge-radius)); } }
+.gods-eye[data-ge-theme].is-booting .gods-eye-chip { animation: ge-chip-in 0.5s calc(1.8s + var(--i, 0) * 45ms) cubic-bezier(.2, 1.3, .3, 1) both; }
+@keyframes ge-chip-in { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+.gods-eye[data-ge-theme].is-booting .gods-eye-info { animation: ge-grow 0.7s 2s cubic-bezier(.2, 1.25, .35, 1) both; }
+.gods-eye[data-ge-theme].is-booting .gods-eye-hint { animation: ge-fade-up 0.6s 2.3s ease both; }
+
+/* ---------- toques próprios de cada modelo ---------- */
+/* Nebulosa: borda de luz girando em volta dos painéis, como o cartão da tela de início */
+@property --ge-spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.gods-eye[data-ge-theme="nebulosa"] :is(.gods-eye-layers, .gods-eye-info)::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--ge-spin), transparent 0 70%, var(--ge-accent-2) 80%, var(--ge-accent-3) 88%, transparent 96%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: ge-edge 6s linear infinite;
+}
+.gods-eye[data-ge-theme="nebulosa"] .gods-eye-info::after { animation-duration: 8s; animation-direction: reverse; }
+@keyframes ge-edge { to { --ge-spin: 360deg; } }
+
+/* Ártico: holograma frio, cantos marcados, linha de varredura no painel, números em fonte de terminal */
+.gods-eye[data-ge-theme="artico"] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place) {
+  background:
+    linear-gradient(var(--ge-accent), var(--ge-accent)) top left / 14px 2px no-repeat, linear-gradient(var(--ge-accent), var(--ge-accent)) top left / 2px 14px no-repeat,
+    linear-gradient(var(--ge-accent), var(--ge-accent)) bottom right / 14px 2px no-repeat, linear-gradient(var(--ge-accent), var(--ge-accent)) bottom right / 2px 14px no-repeat,
+    linear-gradient(160deg, var(--ge-glass-hi), rgba(255, 255, 255, 0.01) 42%), var(--ge-glass);
+}
+.gods-eye[data-ge-theme="artico"] .gods-eye-layers::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0 46%, rgba(34, 211, 238, 0.12) 50%, transparent 54%) 0 100% / 100% 300%; animation: ge-holo 4.5s linear infinite;
+}
+@keyframes ge-holo { to { background-position: 0 0; } }
+.gods-eye[data-ge-theme="artico"] .gods-eye-chip { font-family: var(--ge-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.gods-eye[data-ge-theme="artico"] .gods-eye-chip::before { border-radius: 1px; transform: rotate(45deg); }
+.gods-eye[data-ge-theme="artico"] .gods-eye-chip.is-on { border-left: 2px solid var(--ge-accent); }
+.gods-eye[data-ge-theme="artico"] .gods-eye-chip.is-on::before { transform: rotate(45deg) scale(1.25); }
+.gods-eye[data-ge-theme="artico"] .gods-eye-title { letter-spacing: 0.4em; font-weight: 500; }
+
+/* Aurora: vidro bem fosco e arredondado, cores que se movem devagar no fundo e nos botões ligados */
+.gods-eye[data-ge-theme="aurora"]::before {
+  inset: -20%; background: conic-gradient(from 0deg at 50% 50%, rgba(52, 211, 153, 0.10), rgba(139, 92, 246, 0.12), rgba(45, 212, 191, 0.08), rgba(52, 211, 153, 0.10));
+  filter: blur(60px); animation: ge-aurora-drift 18s linear infinite;
+}
+@keyframes ge-aurora-drift { to { transform: rotate(360deg); } }
+.gods-eye[data-ge-theme="aurora"] .gods-eye-chip.is-on { background-size: 200% 100%; animation: ge-aurora-flow 6s ease-in-out infinite; }
+.gods-eye[data-ge-theme="aurora"] .gods-eye-chip.is-on.ge-grow { animation: ge-press 0.45s cubic-bezier(.2, 1.4, .4, 1), ge-aurora-flow 6s ease-in-out infinite; }
+@keyframes ge-aurora-flow { 50% { background-position: 100% 0; } }
+.gods-eye[data-ge-theme="aurora"] .gods-eye-title { font-weight: 600; letter-spacing: 0.28em; background: linear-gradient(90deg, #d1fae5, var(--ge-accent), var(--ge-accent-2)); -webkit-background-clip: text; background-clip: text; }
+.gods-eye[data-ge-theme="aurora"] .gods-eye-layers { padding-top: 36px; }
+
+/* Solar: painel tático, cantos cortados, faixa de alerta no botão ligado e brilho quente */
+.gods-eye[data-ge-theme="solar"] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place) {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  border-left: 3px solid var(--ge-accent);
+}
+.gods-eye[data-ge-theme="solar"] .gods-eye-chip { clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 0.68rem; }
+.gods-eye[data-ge-theme="solar"] .gods-eye-chip::before { border-radius: 0; width: 8px; height: 3px; margin-top: -1.5px; }
+.gods-eye[data-ge-theme="solar"] .gods-eye-chip.is-on { color: #fff7ed; text-shadow: 0 0 8px rgba(0, 0, 0, 0.6); }
+.gods-eye[data-ge-theme="solar"] .gods-eye-layers::before { content: "▲ CAMADAS · SISTEMA TÁTICO"; color: var(--ge-accent); }
+.gods-eye[data-ge-theme="solar"] .gods-eye-info strong { text-transform: uppercase; }
+.gods-eye[data-ge-theme="solar"] .gods-eye-close { clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+.gods-eye[data-ge-theme="solar"] .gods-eye-boot-ring.r2 { border-style: dotted; border-width: 3px; }
+
+/* ---------- celular: mesma aparência, organização de antes (fileira de camadas que rola de lado) ---------- */
+@media (max-width: 760px) {
+  .gods-eye[data-ge-theme] .gods-eye-head { top: 10px; left: 10px; right: 10px; padding: 8px 8px 8px 14px; flex-wrap: wrap; gap: 2px 10px; }
+  .gods-eye[data-ge-theme] .gods-eye-title { font-size: 0.8rem; letter-spacing: 0.22em; }
+  .gods-eye[data-ge-theme] .gods-eye-close { width: 40px; height: 40px; }
+  .gods-eye[data-ge-theme] .gods-eye-layers {
+    left: 8px; right: 8px; bottom: 88px; flex-direction: row; padding: 8px; gap: 6px; overflow-x: auto; overflow-y: hidden; max-height: none;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .gods-eye[data-ge-theme] .gods-eye-layers::before, .gods-eye[data-ge-theme] .gods-eye-layers::after { display: none; }
+  .gods-eye[data-ge-theme] .gods-eye-chip, .gods-eye[data-ge-theme] .gods-eye-chip.is-on { flex: none; min-width: 0; padding: 9px 14px 9px 26px; white-space: nowrap; }
+  .gods-eye[data-ge-theme] .gods-eye-info { left: 10px; right: 10px; bottom: 150px; min-width: 0; max-width: none; }
+  .gods-eye[data-ge-theme] .gods-eye-place { top: auto; left: 8px; right: 8px; bottom: 150px; width: auto; max-height: 50vh; }
+  .gods-eye[data-ge-theme]::before { display: none; }
+  /* celular: o vidro fosco por cima do globo custa quadros; fica só o translúcido */
+  html.kira-remote .gods-eye[data-ge-theme] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place) { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+/* o Windows do Chefe está com "mostrar animações" desligado; ele quer as animações da Kira: não seguimos o reduced-motion aqui */
+
+/* ---------- desempenho (2026-10-29): o PC desenha o globo sem placa de vídeo ----------
+   Vidro fosco (backdrop-filter) por cima de um globo/mapa que se move era refeito a cada quadro: o Olho de Deus caía
+   para poucos quadros e travava no zoom e na viagem. O vidro fica mais denso (mesma cor e luz, sem desfocar o fundo) e
+   as luzes que corriam sem parar só correm ao passar o mouse; a ativação continua igual. */
+.gods-eye[data-ge-theme] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place, .gods-eye-hud-text) {
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  background-color: color-mix(in srgb, var(--ge-void) 72%, transparent);
+}
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on::after { animation: none; }
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on:hover::after { animation: ge-sweep 1.4s ease-in-out; }
+.gods-eye[data-ge-theme="nebulosa"] :is(.gods-eye-layers, .gods-eye-info)::after { animation-duration: 14s; }
+.gods-eye[data-ge-theme="aurora"]::before { animation: none; filter: none; }
+.gods-eye[data-ge-theme="artico"] .gods-eye-layers::after { animation: none; }
+/* com o mapa de ruas por cima, a borda de luz para de girar (o Leaflet já pesa) */
+.gods-eye-map.is-visible ~ :is(.gods-eye-layers, .gods-eye-info)::after { animation-play-state: paused !important; }
+
+/* barra da direita (2026-11-03): busca, 9 categorias, camadas com fonte e hora, filtros, mapa e favoritos */
+.gods-eye[data-ge-theme] .gods-eye-side {
+  left: auto; right: 22px; top: 96px; bottom: 22px; width: 300px; max-height: none; padding: 12px; gap: 8px; display: flex; flex-direction: column;
+}
+.gods-eye[data-ge-theme] .gods-eye-side::before { content: none; }
+.gods-eye[data-ge-theme] .gods-eye-info { right: auto; left: 22px; }
+.gods-eye[data-ge-theme] .gods-eye-place { right: 340px; }
+.gods-eye .ge-search {
+  width: 100%; padding: 9px 12px; border-radius: calc(var(--ge-radius) * 0.6); border: 1px solid var(--ge-edge); background: rgba(0, 0, 0, 0.35);
+  color: var(--ge-ink); font: inherit; font-size: 0.78rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.gods-eye .ge-search:focus { border-color: var(--ge-accent-2); box-shadow: 0 0 16px var(--ge-glow); }
+.gods-eye .ge-suggest { display: flex; flex-direction: column; gap: 2px; }
+.gods-eye .ge-suggest:empty { display: none; }
+.gods-eye .ge-hint { text-align: left; padding: 6px 10px; border: 0; border-radius: 6px; background: rgba(255, 255, 255, 0.04); color: var(--ge-ink); font: inherit; font-size: 0.7rem; cursor: pointer; }
+.gods-eye .ge-hint:hover { background: color-mix(in srgb, var(--ge-accent) 30%, transparent); }
+.gods-eye .ge-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.gods-eye .ge-tab {
+  padding: 6px 4px; border-radius: 6px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.04); color: var(--ge-muted);
+  font: inherit; font-size: 0.66rem; letter-spacing: 0.04em; cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.gods-eye .ge-tab:hover { color: var(--ge-ink); }
+.gods-eye .ge-tab.is-on { color: #fff; background: var(--ge-on-bg); border-color: var(--ge-accent-2); box-shadow: 0 0 14px var(--ge-glow); }
+.gods-eye .ge-panes { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.gods-eye .ge-pane { display: flex; flex-direction: column; gap: 5px; animation: ge-fade-up 0.3s ease both; }
+.gods-eye .ge-pane[hidden] { display: none; }
+.gods-eye[data-ge-theme] .gods-eye-side .gods-eye-chip { min-width: 0; width: 100%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+.gods-eye[data-ge-theme] .gods-eye-side .gods-eye-chip.is-on { min-width: 0; }
+.gods-eye .ge-chip-meta { font-size: 0.6rem; opacity: 0.7; font-family: var(--ge-mono); }
+.gods-eye .ge-chip-meta:empty { display: none; }
+.gods-eye .gods-eye-chip:disabled .ge-chip-meta { color: #fca5a5; opacity: 0.85; }
+.gods-eye .ge-muted { color: var(--ge-muted); font-size: 0.66rem; padding: 4px 2px 0; }
+.gods-eye .ge-filters { display: flex; flex-direction: column; gap: 4px; padding: 2px 6px 6px; }
+.gods-eye .ge-slider { display: flex; flex-direction: column; }
+.gods-eye .ge-slider input { accent-color: var(--ge-accent-2); width: 100%; }
+.gods-eye .ge-row { display: flex; gap: 4px; align-items: stretch; flex-wrap: wrap; }
+.gods-eye .ge-row > .gods-eye-chip { flex: 1; }
+.gods-eye .ge-row > .ge-tab { flex: 1; text-transform: capitalize; }
+.gods-eye .ge-x { width: 30px; border: 1px solid var(--ge-edge); border-radius: 6px; background: transparent; color: var(--ge-muted); cursor: pointer; }
+.gods-eye .ge-favs { display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 760px) {
+  .gods-eye[data-ge-theme] .gods-eye-side { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 44vh; flex-direction: column; padding: 10px; }
+  .gods-eye[data-ge-theme] .gods-eye-info { left: 12px; right: 12px; bottom: calc(44vh + 16px); }
+  .gods-eye[data-ge-theme] .gods-eye-place { right: 8px; }
+}
+
+/* desempenho (2026-11-03): sem desfoque de vidro e sem brilhos animados por cima do globo (pesavam na GTX 550 Ti);
+   o fundo fica um pouco mais opaco para manter a leitura; a entrada cabe em ~1 s */
+.gods-eye[data-ge-theme] :is(.gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-place) {
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  background: linear-gradient(160deg, var(--ge-glass-hi), rgba(255, 255, 255, 0.01) 42%), rgba(8, 4, 20, 0.88);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on::after,
+.gods-eye[data-ge-theme] :is(.gods-eye-layers, .gods-eye-info)::after { animation: none !important; }
+
+/* ===== Dock + janela lateral (2026-11-05): coluna de ícones de categoria à direita; tocar num ícone abre uma
+   janelinha ao lado com as camadas daquela categoria. Compacto, sem blur; abrir usa opacity+transform (GPU). ===== */
+.gods-eye[data-ge-theme] .gods-eye-side { width: auto; padding: 0; gap: 8px; bottom: auto; max-height: calc(100% - 118px);
+  background: none; backdrop-filter: none; border: 0; border-radius: 0; display: flex; flex-direction: column; align-items: flex-end; }
+.gods-eye .ge-dock-top { width: 240px; }
+.gods-eye .ge-dock-row { display: flex; align-items: flex-start; gap: 8px; }
+/* coluna de ícones */
+.gods-eye .ge-dock { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 18px;
+  background: rgba(8, 6, 18, .92); border: 1px solid rgba(167, 139, 250, .25); }
+.gods-eye .ge-dock-btn { position: relative; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px;
+  border: 1px solid transparent; background: rgba(255, 255, 255, .03); cursor: pointer; transition: background .15s, border-color .15s, transform .12s; }
+.gods-eye .ge-dock-btn:hover { background: color-mix(in srgb, var(--cat) 16%, transparent); transform: translateY(-1px); }
+.gods-eye .ge-dock-btn.is-on { border-color: var(--cat); background: color-mix(in srgb, var(--cat) 22%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--cat) 45%, transparent); }
+.gods-eye .ge-dock-emoji { font-size: 20px; line-height: 1; }
+.gods-eye .ge-dock-count { position: absolute; top: 2px; right: 3px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 99px;
+  font: 700 9px var(--ge-mono, monospace); display: grid; place-items: center; color: #0b0718; background: var(--cat); }
+/* janela lateral (flyout) */
+.gods-eye .ge-flyout { width: 230px; padding: 10px; border-radius: 16px; background: rgba(8, 6, 18, .95);
+  border: 1px solid color-mix(in srgb, var(--cat) 55%, transparent); box-shadow: 0 0 20px color-mix(in srgb, var(--cat) 20%, transparent);
+  animation: ge-fly-in .16s ease-out both; }
+.gods-eye .ge-flyout[hidden] { display: none; }
+@keyframes ge-fly-in { from { opacity: 0; transform: translateX(10px); } }
+.gods-eye .ge-fly-title { font: 700 .74rem var(--ge-body, sans-serif); letter-spacing: .04em; color: #fff; margin-bottom: 8px; padding-left: 2px; }
+.gods-eye .ge-pane { display: flex; flex-direction: column; gap: 5px; }
+.gods-eye[data-ge-theme] .ge-pane .gods-eye-chip { min-width: 0; width: 100%; padding: 7px 10px 7px 34px; border-radius: 10px; }
+.gods-eye[data-ge-theme] .ge-pane .gods-eye-chip::before { content: attr(data-emoji); left: 9px; top: 50%; width: auto; height: auto; transform: translateY(-50%); background: none; box-shadow: none; font-size: 14px; border-radius: 0; animation: none; }
+.gods-eye[data-ge-theme] .ge-pane .gods-eye-chip.is-on { border-color: var(--cat); background: color-mix(in srgb, var(--cat) 16%, transparent); color: #fff; }
+.gods-eye[data-ge-theme] .ge-pane .gods-eye-chip:disabled { opacity: .45; }
+@media (prefers-reduced-motion: reduce) { .gods-eye .ge-flyout { animation: none; } }
+/* Desempenho (2026-11-05): efeitos infinitos decorativos repintavam por cima do globo em todo quadro.
+   Fica o globo (WebGL na placa de vídeo) + entradas curtas; somem o brilho correndo em cada camada ligada,
+   a faixa holográfica e a aurora animada com blur grande. */
+.gods-eye[data-ge-theme] .gods-eye-chip.is-on::after { animation: none !important; opacity: 0; }
+.gods-eye[data-ge-theme] :is(.gods-eye-layers, .gods-eye-info, .gods-eye-head)::after { animation: none !important; }
+.gods-eye[data-ge-theme="aurora"] .gods-eye-chip.is-on { animation: none; }
+.gods-eye[data-ge-theme="aurora"]::before, .gods-eye[data-ge-theme="aurora"]::after { animation: none !important; }
+.gods-eye[data-ge-theme] .gods-eye-hud-text { backdrop-filter: none; background: rgba(8, 6, 18, .88); }
+/* entrada do painel mais curta e só com transform/opacity (sem clip-path, que repinta) */
+.gods-eye[data-ge-theme].is-booting .gods-eye-layers { animation: ge-panel-in2 .45s 1.1s cubic-bezier(.2, 1, .3, 1) both; }
+@keyframes ge-panel-in2 { from { opacity: 0; transform: translate3d(24px, 0, 0) scale(.97); } }
+.gods-eye[data-ge-theme].is-booting .gods-eye-chip { animation: none; }
+
+/* 2026-11-05 (Chefe): o menu de ícones herdava fundo+sombra do painel antigo = "painel invisível com sombra" atrás dele. */
+.gods-eye[data-ge-theme] .gods-eye-side { box-shadow: none !important; background: none !important; }
+/* Entrada sem travar: só opacity/transform (compositor). Sai o blur+letter-spacing do título (refazia o layout a cada
+   quadro) e o filter de brilho no palco do globo (repintava o WebGL inteiro). */
+@keyframes ge-title-in { from { opacity: 0; transform: scale(1.25); } to { opacity: 1; transform: none; } }
+@keyframes ge-stage-in { from { opacity: 0; } to { opacity: 1; } }
+.gods-eye[data-ge-theme].is-booting :is(.gods-eye-stage, .gods-eye-head, .gods-eye-layers, .gods-eye-info, .gods-eye-boot-text strong) { will-change: transform, opacity; }
+@keyframes ge-grow { 0% { opacity: 0; transform: scale(0.85) translateY(10px); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }

@@ -1,0 +1,149 @@
+/* Aba Internet: o navegador da Kira ao vivo. Painel grande (a página precisa de espaço), sem borda, com a linha de
+   luz no alto como os cartões das outras abas; barra de endereço, linha do que a Kira está fazendo e a imagem. Só
+   transform/opacity animam (a imagem ao vivo já é redesenhada a cada quadro). */
+#browser-drawer {
+  --brw-accent: #38bdf8;
+  position: fixed !important;
+  top: 54px !important;
+  left: 76px !important;
+  right: 84px !important;
+  bottom: 12px !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: rgba(8, 6, 18, 0.97) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(12px) !important;
+  transition: transform calc(0.28s * var(--kira-anim-speed, 1)) ease, opacity calc(0.24s * var(--kira-anim-speed, 1)) ease !important;
+  z-index: var(--z-open-panel) !important;
+}
+#browser-drawer.open { opacity: 1 !important; pointer-events: auto !important; transform: none !important; }
+#browser-drawer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--brw-accent) 10%, color-mix(in srgb, var(--brw-accent) 45%, #fff) 24%,
+    color-mix(in srgb, var(--brw-accent) 40%, transparent) 72%, transparent);
+  pointer-events: none;
+}
+#browser-drawer .brw-modal { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
+
+#browser-drawer .brw-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px 8px; flex: 0 0 auto; }
+#browser-drawer .brw-header-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+#browser-drawer .brw-header-icon {
+  display: grid; flex: 0 0 auto; place-items: center; width: 34px; height: 34px; border-radius: 10px;
+  background: color-mix(in srgb, var(--brw-accent) 22%, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--brw-accent) 30%, transparent);
+}
+#browser-drawer .brw-header-icon svg { stroke: #e0f2fe; }
+#browser-drawer .brw-header-titles { display: grid; gap: 2px; min-width: 0; }
+#browser-drawer .brw-header-title { font-family: 'Orbitron', var(--font-ui, sans-serif); font-size: 0.86rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #e0f2fe; }
+#browser-drawer .brw-header-sub { overflow: hidden; max-width: 60vw; font-size: 0.7rem; color: rgba(186, 230, 253, 0.6); white-space: nowrap; text-overflow: ellipsis; }
+#browser-drawer .brw-close-btn {
+  flex: 0 0 auto; width: 30px; height: 30px; border: 0; border-radius: 9px; background: rgba(255, 255, 255, 0.05);
+  color: rgba(224, 242, 254, 0.75); font-size: 1.1rem; cursor: pointer;
+}
+#browser-drawer .brw-close-btn:hover { background: rgba(248, 113, 113, 0.16); color: #fecaca; }
+
+#browser-drawer .brw-toolbar { display: flex; align-items: center; gap: 6px; padding: 0 16px 8px; flex: 0 0 auto; }
+#browser-drawer .brw-nav {
+  display: grid; flex: 0 0 auto; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04); color: #bae6fd; cursor: pointer;
+}
+#browser-drawer .brw-nav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#browser-drawer .brw-nav:hover:not(:disabled) { background: color-mix(in srgb, var(--brw-accent) 20%, transparent); }
+#browser-drawer .brw-nav:disabled { opacity: 0.3; cursor: default; }
+#browser-drawer .brw-address { flex: 1 1 auto; min-width: 0; margin: 0; }
+#browser-drawer .brw-address input {
+  width: 100%; box-sizing: border-box; height: 30px; padding: 0 12px; border: 0; border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05); color: #e0f2fe; font: inherit; font-size: 0.74rem; outline: none;
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--brw-accent) 30%, transparent);
+}
+#browser-drawer .brw-address input:focus { box-shadow: inset 0 -2px 0 var(--brw-accent); background: rgba(255, 255, 255, 0.08); }
+#browser-drawer .brw-stop {
+  flex: 0 0 auto; height: 30px; padding: 0 12px; border: 0; border-radius: 9px; background: rgba(244, 63, 94, 0.18);
+  color: #fecdd3; font: inherit; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+}
+#browser-drawer .brw-stop:hover { background: rgba(244, 63, 94, 0.32); }
+#browser-drawer .brw-stop[hidden] { display: none; }
+
+/* O que a Kira está fazendo / a pergunta dela (com campo para responder escrevendo) */
+#browser-drawer .brw-status {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 16px 8px; padding: 7px 12px; border-radius: 10px;
+  background: color-mix(in srgb, var(--brw-accent) 10%, transparent); color: #e0f2fe; font-size: 0.72rem; line-height: 1.35;
+}
+#browser-drawer .brw-status[hidden] { display: none; }
+#browser-drawer .brw-status[data-kind="waiting"] { background: rgba(250, 204, 21, 0.14); color: #fef9c3; }
+#browser-drawer .brw-status[data-kind="failed"] { background: rgba(244, 63, 94, 0.14); color: #ffe4e6; }
+#browser-drawer .brw-status[data-kind="done"] { background: rgba(34, 197, 94, 0.14); color: #dcfce7; }
+#browser-drawer .brw-answer { display: flex; flex: 1 1 260px; gap: 6px; margin: 0; }
+#browser-drawer .brw-answer[hidden] { display: none; }
+#browser-drawer .brw-answer input {
+  flex: 1 1 auto; min-width: 0; height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: rgba(0, 0, 0, 0.3);
+  color: #fff; font: inherit; outline: none;
+}
+#browser-drawer .brw-answer button {
+  height: 28px; padding: 0 12px; border: 0; border-radius: 8px; background: rgba(250, 204, 21, 0.3); color: #fff;
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+
+/* A página ao vivo: ocupa o resto, sem cortar (a proporção da página é mantida) */
+#browser-drawer .brw-stage {
+  position: relative; flex: 1 1 auto; min-height: 0; margin: 0 16px 16px; border-radius: 12px; overflow: hidden;
+  background: #05040c; outline: none;
+}
+#browser-drawer .brw-stage:focus-visible { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--brw-accent) 60%, transparent); }
+#browser-drawer #kira-browser-view { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; cursor: pointer; user-select: none; }
+#browser-drawer #kira-browser-view[hidden] { display: none; }
+#browser-drawer .brw-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: 24px; text-align: center; color: rgba(186, 230, 253, 0.75);
+}
+#browser-drawer .brw-placeholder[hidden] { display: none; }
+#browser-drawer .brw-placeholder-icon {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; margin-bottom: 4px;
+  background: color-mix(in srgb, var(--brw-accent) 14%, transparent); color: #7dd3fc;
+}
+#browser-drawer .brw-placeholder-text { font-size: 0.9rem; font-weight: 700; color: #e0f2fe; }
+#browser-drawer .brw-placeholder-sub { max-width: 460px; font-size: 0.72rem; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  #browser-drawer { top: 56px !important; left: 8px !important; right: 8px !important; bottom: 8px !important; }
+  #browser-drawer .brw-header-sub { max-width: 52vw; }
+}
+html[data-kira-motion="off"] #browser-drawer { transition: none !important; }
+
+/* Com uma aba aberta (Internet, WhatsApp, Música) os botões laterais ficam à vista por cima dela, parados no lugar
+   (o mouse não os faz deslizar sobre o site); o da aba aberta fica aceso. Antes sumiam (2026-10-31: "não é para sumir"). */
+body:has(#browser-drawer.open, #whatsapp-drawer.open, #music-drawer.open) :is(#drawer-whatsapp-btn-float, #drawer-nav-btn-float, #drawer-music-btn-float).side-png-button {
+  opacity: 1 !important; pointer-events: auto !important; z-index: 100001 !important; right: calc(-180px + var(--ui-sidebar-offset-x)) !important;
+}
+body:has(#browser-drawer.open, #whatsapp-drawer.open, #music-drawer.open) :is(#drawer-whatsapp-btn-float, #drawer-nav-btn-float, #drawer-music-btn-float).side-png-button.active {
+  filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.9)) brightness(1.2) !important;
+}
+
+/* Aba Internet viva (2026-11-01): faixa de LED, ícone aceso e atalhos com o ícone de cada site */
+#browser-drawer { box-shadow: 0 30px 70px rgba(0, 0, 0, .6), 0 0 0 1px rgba(56, 189, 248, .35), 0 0 46px rgba(56, 189, 248, .25) !important; }
+#browser-drawer .brw-header { position: relative; }
+#browser-drawer .brw-header::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #22d3ee, #3b82f6 35%, #a855f7 70%, #ec4899); box-shadow: 0 0 10px #38bdf8, 0 0 18px rgba(168, 85, 247, .5); }
+#browser-drawer .brw-header-icon { background: radial-gradient(circle at 35% 30%, #67e8f9, #2563eb 70%) !important; color: #fff !important; box-shadow: 0 0 16px rgba(56, 189, 248, .85) !important; }
+#browser-drawer .brw-placeholder-icon { width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #67e8f9, #2563eb 70%); color: #fff; box-shadow: 0 0 26px rgba(56, 189, 248, .8); }
+#browser-drawer .brw-placeholder-icon svg { width: 30px; height: 30px; }
+#browser-drawer .brw-placeholder-text { font: 700 20px "Orbitron", sans-serif; letter-spacing: .06em; text-shadow: 0 0 14px rgba(56, 189, 248, .6); }
+.brw-dial { display: grid; grid-template-columns: repeat(4, 112px); gap: 14px; margin-top: 22px; justify-content: center; }
+.brw-dial button { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 12px; border-radius: 16px; color: #e0f2fe; font: 600 12px var(--font-ui, "Segoe UI", sans-serif); cursor: pointer; background: linear-gradient(160deg, rgba(56, 189, 248, .12), rgba(15, 23, 42, .6)); border: 1px solid rgba(56, 189, 248, .3); transition: transform .15s, box-shadow .15s, border-color .15s; }
+.brw-dial button:hover, .brw-dial button:focus-visible { transform: translateY(-3px); border-color: #38bdf8; box-shadow: 0 0 18px rgba(56, 189, 248, .5); outline: none; }
+.brw-dial img { width: 36px; height: 36px; border-radius: 9px; background: #fff; padding: 4px; }

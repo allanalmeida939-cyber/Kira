@@ -1,0 +1,344 @@
+/* Rota da Kira (routeView.js): 4 modelos diferentes de layout, material, entrada e desenho da rota. */
+/* tamanho na tela: cabe ao lado da transcrição e acima dos botões (antes cobria a tela inteira) */
+.krv-float { position: fixed; z-index: 8400; left: 50%; top: 46%; transform: translate(-50%, -50%); width: min(780px, 62vw); }
+.krv-float[hidden] { display: none; }
+.krv-float.is-out { animation: krv-out .4s ease-in both; }
+@keyframes krv-out { to { opacity: 0; transform: translate(-50%, -50%) scale(.94); filter: blur(6px); } }
+
+.krv {
+  --ink: #f4efff; --muted: #a99bd4; --edge: rgba(196, 160, 255, .3); --accent: #c084fc; --hot: #f0abfc; --cool: #5eead4; --line: #f5d0fe; --glow: rgba(168, 85, 247, .7);
+  --display: "Chakra Petch", "Orbitron", sans-serif; --body: "Sora", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+  position: relative; color: var(--ink); font-family: var(--body); font-size: 13px; line-height: 1.35; opacity: 0;
+}
+.krv.is-in { opacity: 1; }
+.krv * { box-sizing: border-box; }
+.krv button { font: inherit; color: inherit; cursor: pointer; }
+.krv button:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.krv-label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); margin: 2px 0 6px; }
+.krv-ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* mapa: fundo transparente, só as ruas recoloridas; rota e pontos por cima */
+.krv-map { position: absolute; inset: 0; background: transparent !important; font-family: var(--body); }
+.krv-map .leaflet-tile-pane { opacity: .9; }
+.krv-map .leaflet-control-attribution { background: rgba(5, 3, 12, .55) !important; color: rgba(255, 255, 255, .45) !important; font-size: 9px; padding: 0 6px; border-radius: 6px 0 0 0; }
+.krv-map .leaflet-control-attribution a { color: inherit; }
+.krv-line { stroke: var(--line); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+/* brilho da rota: traço largo e fraco (sem filtro de desfoque, que era refeito a cada quadro do desenho) */
+.krv-glow { stroke: var(--accent); stroke-width: 14; stroke-opacity: .28; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.krv-line.is-walk, .krv-glow.is-walk { stroke-dasharray: 2 9; stroke: var(--cool); }
+.krv-glow.is-walk { stroke-dasharray: none; stroke-opacity: .15; }
+.krv-line.is-bus { stroke: #fde68a; }
+.krv-glow.is-bus { stroke: #f59e0b; }
+.krv-alt-line { stroke: var(--muted); stroke-width: 4; stroke-opacity: .45; stroke-dasharray: 1 7; stroke-linecap: round; fill: none; cursor: pointer; pointer-events: stroke; }
+.krv-alt-line:hover { stroke-opacity: .9; stroke: var(--hot); }
+.krv-marker i { position: absolute; inset: 5px; border-radius: 50%; border: 3px solid var(--c); background: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 30%, transparent), 0 0 18px var(--c); }
+.krv-marker span { position: absolute; left: 28px; top: -4px; font: 700 12px var(--display); color: var(--c); text-shadow: 0 0 6px #000; }
+.krv-marker.is-a { --c: var(--cool); }
+.krv-marker.is-b { --c: var(--hot); }
+/* desenho da rota: o traço cresce de A até B (--len = comprimento do SVG) */
+.krv.is-route-in .krv-line:not(.is-walk) { stroke-dasharray: var(--len) var(--len); animation: krv-draw var(--draw, 1.4s) var(--ease, cubic-bezier(.6, 0, .2, 1)) both; }
+.krv.is-route-in .krv-glow { animation: krv-glow-in var(--draw, 1.4s) ease both; }
+.krv.is-route-in .krv-marker.is-b i { animation: krv-ping .9s calc(var(--draw, 1.4s) - .1s) ease-out both; }
+@keyframes krv-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+@keyframes krv-glow-in { from { stroke-opacity: 0; } 70% { stroke-opacity: .55; } to { stroke-opacity: .35; } }
+@keyframes krv-ping { 0% { box-shadow: 0 0 0 0 var(--c), 0 0 18px var(--c); } 100% { box-shadow: 0 0 0 26px transparent, 0 0 18px var(--c); } }
+
+.krv-zoom { position: absolute; z-index: 5; display: grid; gap: 4px; }
+.krv-zoom-btn { width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--edge); background: rgba(10, 6, 22, .7); font-size: 15px; line-height: 1; transition: background .2s, transform .2s; }
+.krv-zoom-btn:hover { background: color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.06); }
+.krv-close { position: absolute; z-index: 6; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--edge); background: rgba(10, 6, 22, .7); font-size: 18px; line-height: 1; transition: transform .25s, background .25s; }
+.krv-close:hover { transform: rotate(90deg); background: color-mix(in srgb, var(--accent) 35%, transparent); }
+
+.krv-minutes { display: grid; gap: 4px; }
+.krv-minutes-n { font: 700 46px/1 var(--display); letter-spacing: .02em; background: linear-gradient(180deg, #fff, var(--hot) 60%, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 14px var(--glow)); }
+.krv-minutes-sub { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.krv-places { display: grid; gap: 6px; }
+.krv-place { display: grid; grid-template-columns: 12px auto minmax(0, 1fr); gap: 8px; align-items: center; min-width: 0; }
+.krv-pin { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--c); box-shadow: 0 0 10px var(--c); }
+.krv-place.is-a { --c: var(--cool); }
+.krv-place.is-b { --c: var(--hot); }
+.krv-place-tag { font: 700 10px var(--mono); color: var(--c); letter-spacing: .1em; }
+.krv-place-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.krv-modes { display: grid; gap: 5px; }
+.krv-mode { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 7px 10px; border-radius: 12px; border: 1px solid transparent; background: rgba(255, 255, 255, .035); text-align: left; overflow: hidden; transition: background .25s, border-color .25s, transform .25s, box-shadow .25s; }
+.krv-mode:hover { background: rgba(255, 255, 255, .07); transform: translateX(2px); }
+.krv-mode.is-on { border-color: color-mix(in srgb, var(--hot) 70%, transparent); background: linear-gradient(135deg, rgba(124, 58, 237, .5), rgba(192, 38, 211, .32)); box-shadow: 0 0 20px color-mix(in srgb, var(--glow) 60%, transparent); }
+.krv-mode-text { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; min-width: 0; }
+.krv-mode-name { color: var(--ink); }
+.krv-mode-time { font: 600 13px var(--mono); }
+.krv-mode-extra { grid-column: 1 / -1; color: var(--muted); font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.krv-mode-bar { display: none; }
+.krv-alts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.krv-alts:empty { display: none; }
+.krv-alts .krv-label { flex-basis: 100%; margin: 0; }
+.krv-alt { display: grid; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--edge); background: rgba(255, 255, 255, .03); text-align: left; font-size: 11px; transition: border-color .2s, background .2s; }
+.krv-alt b { font: 600 11px var(--display); letter-spacing: .06em; }
+.krv-alt span { color: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+.krv-alt.is-on { border-color: var(--hot); background: rgba(192, 38, 211, .2); }
+.krv-bus { display: grid; gap: 6px; }
+.krv-bus[hidden] { display: none; }
+.krv-bus-opt { display: grid; gap: 2px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--edge); background: rgba(255, 255, 255, .03); text-align: left; transition: border-color .2s, background .2s; }
+.krv-bus-opt.is-on { border-color: #fbbf24; background: rgba(245, 158, 11, .14); }
+.krv-bus-lines { display: flex; gap: 4px; flex-wrap: wrap; }
+.krv-bus-line { padding: 1px 7px; border-radius: 6px; background: #fbbf24; color: #1c1206; font: 700 11px var(--mono); }
+.krv-bus-name { font-weight: 600; font-size: 12px; }
+.krv-bus-meta { color: var(--muted); font-size: 10.5px; }
+
+/* ===================== 1 · COCKPIT: cartão de vidro escuro, mapa | dados ===================== */
+.krv[data-model="cockpit"] {
+  display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, 1fr); min-height: 470px; border-radius: 24px; overflow: hidden;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .01) 40%), rgba(14, 8, 30, .92);
+  border: 1px solid var(--edge); box-shadow: 0 34px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 60px rgba(168, 85, 247, .2);
+}
+.krv[data-model="cockpit"] .krv-map-wrap { position: relative; border-right: 1px solid var(--edge);
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(91, 33, 182, .25), transparent 75%), repeating-linear-gradient(0deg, rgba(255, 255, 255, .02) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .02) 0 1px, transparent 1px 40px); }
+.krv[data-model="cockpit"] .krv-zoom { left: 14px; top: 14px; }
+.krv[data-model="cockpit"] .krv-side { display: flex; flex-direction: column; gap: 14px; padding: 22px 20px 18px; overflow-y: auto; max-height: 560px; scrollbar-width: thin; }
+.krv[data-model="cockpit"] .krv-mode-bar { display: block; position: absolute; left: 0; bottom: 0; height: 2px; width: calc(var(--share) * 100%); background: linear-gradient(90deg, var(--cool), var(--hot)); opacity: .7; }
+.krv[data-model="cockpit"] .krv-close { right: 14px; top: 14px; }
+.krv[data-model="cockpit"] .krv-unfold-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; z-index: 7; background: linear-gradient(90deg, transparent, var(--hot), var(--cool), transparent); box-shadow: 0 0 20px var(--hot); opacity: 0; pointer-events: none; }
+/* entrada: uma linha de luz aparece e o cartão desdobra para cima e para baixo; a coluna entra em cascata */
+.krv[data-model="cockpit"].is-in { animation: krv-unfold .75s cubic-bezier(.7, 0, .2, 1) both; }
+.krv[data-model="cockpit"].is-in .krv-unfold-line { animation: krv-line-flash .9s ease both; }
+.krv[data-model="cockpit"].is-in .krv-side > * { animation: krv-rise .5s calc(.55s + var(--d, 0s)) cubic-bezier(.2, 1.2, .3, 1) both; }
+.krv[data-model="cockpit"].is-in .krv-side > :nth-child(2) { --d: .08s; }
+.krv[data-model="cockpit"].is-in .krv-side > :nth-child(3) { --d: .14s; }
+.krv[data-model="cockpit"].is-in .krv-mode { animation: krv-rise .45s calc(.75s + var(--i) * 60ms) cubic-bezier(.2, 1.2, .3, 1) both; }
+@keyframes krv-unfold { 0% { opacity: 1; clip-path: inset(49.6% 0 49.6% 0 round 24px); } 35% { clip-path: inset(49.6% 0 49.6% 0 round 24px); } 100% { opacity: 1; clip-path: inset(0 0 0 0 round 24px); } }
+@keyframes krv-line-flash { 0% { opacity: 0; transform: scaleX(0); } 30% { opacity: 1; transform: scaleX(1); } 60% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes krv-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.krv[data-model="cockpit"] { --draw: 1.5s; }
+
+/* ===================== 2 · HOLOGRAMA: nada de cartão, tudo flutua ===================== */
+.krv[data-model="holograma"] {
+  --ink: #ecfeff; --muted: #7fc8d8; --edge: rgba(103, 232, 249, .35); --accent: #22d3ee; --hot: #a5f3fc; --cool: #e0f2fe; --line: #ecfeff; --glow: rgba(34, 211, 238, .7);
+  --display: "JetBrains Mono", Consolas, monospace;
+  height: 540px;
+}
+/* só o mapa e as linhas de varredura somem nas bordas; textos e botões ficam nítidos */
+.krv[data-model="holograma"] .krv-map, .krv[data-model="holograma"]::after { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); }
+.krv[data-model="holograma"]::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(165, 243, 252, .05) 0 1px, transparent 1px 4px); }
+.krv[data-model="holograma"] .krv-map .leaflet-tile-pane { mix-blend-mode: screen; }
+.krv[data-model="holograma"] .krv-holo-left { position: absolute; left: 7%; top: 22%; z-index: 5; display: grid; gap: 6px; pointer-events: none; }
+.krv[data-model="holograma"] .krv-minutes-n { font-size: 70px; font-weight: 500; background: linear-gradient(180deg, #fff, #67e8f9); -webkit-background-clip: text; background-clip: text; }
+.krv[data-model="holograma"] .krv-minutes-sub { max-width: 230px; }
+.krv[data-model="holograma"] .krv-holo-right { position: absolute; right: 7%; top: 20%; z-index: 5; display: grid; gap: 12px; width: min(300px, 34%); }
+.krv[data-model="holograma"] .krv-place { padding: 6px 10px; border-left: 2px solid var(--c); background: linear-gradient(90deg, rgba(34, 211, 238, .12), transparent); }
+.krv[data-model="holograma"] .krv-modes { position: absolute; left: 50%; bottom: 9%; z-index: 5; transform: translateX(-50%); display: flex; gap: 8px; }
+.krv[data-model="holograma"] .krv-mode { flex: none; grid-template-columns: auto auto; padding: 6px 12px; border-radius: 2px; border: 1px solid var(--edge); background: rgba(8, 47, 73, .35); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.krv[data-model="holograma"] .krv-mode-text { grid-template-columns: auto auto; white-space: nowrap; }
+.krv[data-model="holograma"] .krv-mode-extra { display: none; }
+.krv[data-model="holograma"] .krv-mode.is-on { background: rgba(34, 211, 238, .3); box-shadow: 0 0 22px var(--glow); }
+.krv[data-model="holograma"] .krv-bus { position: absolute; right: 4%; bottom: 20%; z-index: 5; width: min(300px, 34%); max-height: 46%; overflow-y: auto; scrollbar-width: none; }
+.krv[data-model="holograma"] .krv-zoom { left: 9%; top: 52%; }
+.krv[data-model="holograma"] .krv-zoom-btn, .krv[data-model="holograma"] .krv-close { border-radius: 2px; background: rgba(8, 47, 73, .5); }
+.krv[data-model="holograma"] .krv-close { right: 9%; top: 9%; }
+.krv[data-model="holograma"] .krv-holo-beam { position: absolute; left: 0; right: 0; height: 3px; bottom: 0; z-index: 6; opacity: 0; pointer-events: none; background: linear-gradient(90deg, transparent, #a5f3fc, transparent); box-shadow: 0 0 24px 6px rgba(34, 211, 238, .6); }
+/* entrada: projetor liga de baixo para cima com uma linha de luz e piscadas */
+.krv[data-model="holograma"].is-in { animation: krv-project 1.1s cubic-bezier(.5, 0, .2, 1) both, krv-flicker 1.4s steps(1, end) both; }
+.krv[data-model="holograma"].is-in .krv-holo-beam { animation: krv-beam 1.1s cubic-bezier(.5, 0, .2, 1) both; }
+.krv[data-model="holograma"].is-in .krv-modes .krv-mode { animation: krv-rise .4s calc(1s + var(--i) * 70ms) ease both; }
+@keyframes krv-project { from { clip-path: inset(100% -40% 0 -40%); } to { clip-path: inset(-40% -40% -40% -40%); } }
+@keyframes krv-flicker { 0% { opacity: 1; } 78% { opacity: 1; } 81% { opacity: .35; } 84% { opacity: 1; } 89% { opacity: .55; } 92% { opacity: 1; } }
+@keyframes krv-beam { 0% { opacity: 1; bottom: 0; } 95% { opacity: 1; bottom: 100%; } 100% { opacity: 0; bottom: 100%; } }
+/* rota: corre como um cometa (traço curto brilhante na frente) e deixa o rastro aceso */
+.krv[data-model="holograma"] { --draw: 1.9s; --ease: linear; }
+.krv[data-model="holograma"].is-route-in .krv-glow { animation: krv-glow-in 1.9s linear both; }
+
+/* ===================== 3 · ITINERÁRIO: folha translúcida em pilha ===================== */
+.krv[data-model="itinerario"] {
+  --edge: rgba(233, 225, 255, .22); --accent: #a78bfa; --hot: #f5d0fe; --line: #ffffff;
+  width: min(640px, 100%); margin: 0 auto; display: grid; gap: 12px; padding: 18px; border-radius: 28px;
+  background: linear-gradient(180deg, rgba(30, 20, 56, .62), rgba(12, 8, 26, .5)); border: 1px solid var(--edge);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+.krv[data-model="itinerario"] .krv-head { display: grid; gap: 12px; padding-right: 36px; }
+.krv[data-model="itinerario"] .krv-minutes { grid-template-columns: auto 1fr; align-items: end; column-gap: 14px; }
+.krv[data-model="itinerario"] .krv-minutes-n { font-size: 40px; background: none; color: #fff; -webkit-background-clip: initial; background-clip: initial; filter: none; text-shadow: 0 0 18px rgba(167, 139, 250, .6); }
+.krv[data-model="itinerario"] .krv-minutes-sub { padding-bottom: 6px; }
+.krv-timeline { display: none; }
+.krv[data-model="itinerario"] .krv-timeline { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; font-size: 12px; }
+.krv-tl-step { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.krv-tl-step span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.krv-tl-step i { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--c); flex: none; box-shadow: 0 0 10px var(--c); }
+.krv-tl-step.is-a { --c: var(--cool); }
+.krv-tl-step.is-b { --c: var(--hot); justify-content: flex-end; flex-direction: row-reverse; text-align: right; }
+.krv-tl-mid { position: relative; display: flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255, 255, 255, .08); font: 600 11px var(--mono); }
+.krv-tl-mid::before, .krv-tl-mid::after { content: ""; position: absolute; top: 50%; width: 40px; border-top: 2px dashed var(--edge); }
+.krv-tl-mid::before { right: 100%; }
+.krv-tl-mid::after { left: 100%; }
+.krv[data-model="itinerario"] .krv-map-wrap { position: relative; height: 290px; border-radius: 18px; overflow: hidden; background: rgba(5, 3, 12, .35); border: 1px solid var(--edge); }
+.krv[data-model="itinerario"] .krv-zoom { right: 10px; top: 10px; }
+.krv[data-model="itinerario"] .krv-alts { position: absolute; left: 10px; bottom: 10px; z-index: 5; }
+.krv[data-model="itinerario"] .krv-alts .krv-label { display: none; }
+.krv[data-model="itinerario"] .krv-alt { background: rgba(12, 8, 26, .78); }
+.krv[data-model="itinerario"] .krv-modes { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.krv[data-model="itinerario"] .krv-mode { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 10px 6px; border-radius: 16px; border: 1px solid var(--edge); gap: 6px; }
+.krv[data-model="itinerario"] .krv-mode .krv-ico { width: 22px; height: 22px; }
+.krv[data-model="itinerario"] .krv-mode-text { grid-template-columns: 1fr; justify-items: center; }
+.krv[data-model="itinerario"] .krv-mode.is-on { background: rgba(167, 139, 250, .28); border-color: var(--hot); }
+.krv[data-model="itinerario"] .krv-close { right: 16px; top: 16px; }
+/* entrada: sobe de baixo como uma folha com mola; os cartões caem um a um */
+.krv[data-model="itinerario"].is-in { animation: krv-sheet .8s cubic-bezier(.2, 1.3, .35, 1) both; }
+.krv[data-model="itinerario"].is-in .krv-head, .krv[data-model="itinerario"].is-in .krv-map-wrap { animation: krv-rise .5s .25s ease both; }
+.krv[data-model="itinerario"].is-in .krv-mode { animation: krv-drop .5s calc(.45s + var(--i) * 70ms) cubic-bezier(.2, 1.5, .4, 1) both; }
+@keyframes krv-sheet { from { opacity: 0; transform: translateY(60%) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes krv-drop { from { opacity: 0; transform: translateY(-14px) scale(.9); } to { opacity: 1; transform: none; } }
+/* rota: formiguinhas andando de A até B e depois a linha firma */
+.krv[data-model="itinerario"].is-route-in .krv-line:not(.is-walk) { stroke-dasharray: 3 10; animation: krv-march 1.2s linear both, krv-solid .4s 1.2s ease both; }
+@keyframes krv-march { from { stroke-dashoffset: 120; opacity: .6; } to { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes krv-solid { to { stroke-dasharray: 1 0; } }
+
+/* ===================== 4 · RADAR: lente redonda com anel de mira ===================== */
+.krv[data-model="radar"] {
+  --ink: #ecfdf5; --muted: #86c9a0; --edge: rgba(134, 239, 172, .35); --accent: #22c55e; --hot: #bef264; --cool: #a7f3d0; --line: #ecfccb; --glow: rgba(34, 197, 94, .7);
+  --display: "Chakra Petch", sans-serif;
+  height: 560px;
+}
+.krv[data-model="radar"] .krv-lens { position: absolute; left: 50%; top: 50%; width: min(500px, 88vw); aspect-ratio: 1; transform: translate(-50%, -50%); }
+.krv[data-model="radar"] .krv-map { border-radius: 50%; overflow: hidden; background: radial-gradient(circle, rgba(4, 30, 16, .55), rgba(2, 12, 6, .82) 70%) !important; box-shadow: inset 0 0 60px rgba(0, 0, 0, .8); }
+.krv-ring { display: none; }
+.krv[data-model="radar"] .krv-ring { display: block; position: absolute; inset: -14px; pointer-events: none; z-index: 4; }
+.krv-ring-a, .krv-ring-b, .krv-sweep { position: absolute; inset: 0; border-radius: 50%; }
+.krv-ring-a { border: 2px solid var(--edge); box-shadow: 0 0 30px rgba(34, 197, 94, .3);
+  background: repeating-conic-gradient(from 0deg, rgba(134, 239, 172, .7) 0 .6deg, transparent .6deg 6deg); -webkit-mask: radial-gradient(circle, transparent 69%, #000 70%, #000 72%, transparent 73%); mask: radial-gradient(circle, transparent 69%, #000 70%, #000 72%, transparent 73%); }
+.krv-ring-b { inset: 6px; border: 1px dashed rgba(134, 239, 172, .45); }
+.krv-sweep { inset: 14px; background: conic-gradient(from 0deg, rgba(134, 239, 172, .28), transparent 60deg); opacity: 0; }
+.krv[data-model="radar"] .krv-minutes { position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 5; text-align: right; width: calc(50% - 270px); min-width: 150px; }
+.krv[data-model="radar"] .krv-minutes-n { font-size: 54px; background: linear-gradient(180deg, #fff, #86efac); -webkit-background-clip: text; background-clip: text; }
+.krv[data-model="radar"] .krv-places { position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 5; width: calc(50% - 270px); min-width: 170px; }
+.krv[data-model="radar"] .krv-modes { position: absolute; inset: 0; z-index: 6; pointer-events: none; display: block; }
+/* botões de modo em volta da lente, na parte de baixo do anel */
+.krv[data-model="radar"] .krv-mode { position: absolute; left: 50%; top: 50%; pointer-events: auto; width: 74px; height: 74px; padding: 0; border-radius: 50%; grid-template-columns: 1fr; justify-items: center; align-content: center; gap: 2px; border: 1px solid var(--edge); background: rgba(2, 20, 10, .82);
+  transform: translate(-50%, -50%) rotate(calc(135deg + var(--i) * 22.5deg)) translateY(-295px) rotate(calc(-135deg - var(--i) * 22.5deg)); }
+.krv[data-model="radar"] .krv-mode-text { grid-template-columns: 1fr; justify-items: center; }
+.krv[data-model="radar"] .krv-mode-name, .krv[data-model="radar"] .krv-mode-extra { display: none; }
+.krv[data-model="radar"] .krv-mode-time { font-size: 11px; }
+.krv[data-model="radar"] .krv-mode:hover { transform: translate(-50%, -50%) rotate(calc(135deg + var(--i) * 22.5deg)) translateY(-295px) rotate(calc(-135deg - var(--i) * 22.5deg)) scale(1.08); }
+.krv[data-model="radar"] .krv-mode.is-on { background: rgba(34, 197, 94, .35); border-color: var(--hot); }
+.krv[data-model="radar"] .krv-alts { position: absolute; right: 0; top: calc(50% + 70px); z-index: 5; width: calc(50% - 270px); min-width: 170px; }
+.krv[data-model="radar"] .krv-bus { position: absolute; left: 0; top: calc(50% + 60px); z-index: 5; width: calc(50% - 270px); min-width: 170px; max-height: 40%; overflow-y: auto; scrollbar-width: none; }
+.krv[data-model="radar"] .krv-zoom { left: 50%; top: 4px; transform: translateX(-50%); grid-auto-flow: column; }
+.krv[data-model="radar"] .krv-zoom-btn, .krv[data-model="radar"] .krv-close { border-radius: 50%; }
+.krv[data-model="radar"] .krv-close { right: calc(50% - 260px); top: 30px; }
+.krv[data-model="radar"] .krv-map .leaflet-control-attribution { display: none; }
+/* entrada: a lente abre como uma íris, o anel gira entrando e a varredura passa uma vez */
+.krv[data-model="radar"].is-in .krv-map { animation: krv-iris .95s cubic-bezier(.6, 0, .2, 1) both; }
+.krv[data-model="radar"].is-in .krv-ring-a { animation: krv-ring-in 1.1s cubic-bezier(.2, 1, .3, 1) both; }
+.krv[data-model="radar"].is-in .krv-sweep { animation: krv-sweep 2.2s .6s linear both; }
+.krv[data-model="radar"].is-in .krv-mode { animation: krv-pop .45s calc(.8s + var(--i) * 80ms) cubic-bezier(.2, 1.5, .4, 1) both; }
+.krv[data-model="radar"].is-in .krv-minutes, .krv[data-model="radar"].is-in .krv-places { animation: krv-fade .6s .9s ease both; }
+@keyframes krv-iris { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(50% at 50% 50%); } }
+@keyframes krv-ring-in { from { opacity: 0; transform: rotate(-120deg) scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes krv-sweep { 0% { opacity: 1; transform: rotate(0); } 90% { opacity: 1; } 100% { opacity: 0; transform: rotate(720deg); } }
+@keyframes krv-pop { from { opacity: 0; scale: .3; } to { opacity: 1; scale: 1; } }
+@keyframes krv-fade { from { opacity: 0; } to { opacity: 1; } }
+.krv[data-model="radar"] { --draw: 1.6s; --ease: cubic-bezier(.3, 0, .3, 1); }
+
+/* ===================== celular ===================== */
+@media (max-width: 760px) {
+  .krv-float { top: 44%; }
+  .krv[data-model="cockpit"] { grid-template-columns: 1fr; grid-template-rows: 280px auto; }
+  .krv[data-model="cockpit"] .krv-map-wrap { border-right: 0; border-bottom: 1px solid var(--edge); }
+  .krv[data-model="cockpit"] .krv-side { max-height: 46vh; }
+  .krv[data-model="holograma"] { height: 72vh; }
+  .krv[data-model="holograma"] .krv-holo-left { top: 4%; }
+  .krv[data-model="holograma"] .krv-minutes-n { font-size: 46px; }
+  .krv[data-model="holograma"] .krv-holo-right { top: auto; bottom: 18%; left: 4%; width: auto; }
+  .krv[data-model="holograma"] .krv-modes { width: 94%; overflow-x: auto; }
+  .krv[data-model="itinerario"] .krv-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .krv[data-model="itinerario"] .krv-map-wrap { height: 230px; }
+  .krv[data-model="radar"] { height: 78vh; }
+  .krv[data-model="radar"] .krv-lens { width: 82vw; top: 40%; }
+  .krv[data-model="radar"] .krv-minutes { left: 50%; top: 4%; transform: translateX(-50%); text-align: center; width: auto; }
+  .krv[data-model="radar"] .krv-places { left: 4%; right: 4%; top: auto; bottom: 2%; transform: none; width: auto; }
+  .krv[data-model="radar"] .krv-mode { transform: translate(-50%, -50%) rotate(calc(135deg + var(--i) * 22.5deg)) translateY(-46vw) rotate(calc(-135deg - var(--i) * 22.5deg)); width: 56px; height: 56px; }
+  .krv[data-model="radar"] .krv-alts, .krv[data-model="radar"] .krv-bus { display: none; }
+}
+/* o Windows do Chefe está com "mostrar animações" desligado; ele quer as animações da Kira: não seguimos o reduced-motion aqui */
+
+/* ===================== FUSÕES do Cockpit (coluna de dados) com o Holograma (transparente, projetado) ===================== */
+.krv[data-model^="fusao"] {
+  --ink: #effbff; --muted: #9ec3d8; --edge: rgba(125, 211, 252, .34); --accent: #8b5cf6; --hot: #a5f3fc; --cool: #5eead4; --line: #ecfeff; --glow: rgba(56, 189, 248, .6);
+  --draw: 1.8s; --ease: linear;
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, 1fr); min-height: 380px; font-size: 12px;
+}
+.krv[data-model^="fusao"] .krv-map-wrap { position: relative; }
+.krv[data-model^="fusao"] .krv-side { display: flex; flex-direction: column; gap: 9px; padding: 16px 16px 14px; overflow-y: auto; max-height: min(460px, 70vh); scrollbar-width: thin; position: relative; z-index: 2; }
+.krv[data-model^="fusao"] .krv-zoom { left: 14px; top: 14px; }
+.krv[data-model^="fusao"] .krv-close { right: 14px; top: 14px; }
+.krv[data-model^="fusao"] .krv-minutes-n { font-family: var(--mono); font-weight: 500; font-size: 38px; background: linear-gradient(180deg, #fff, #67e8f9 55%, #a78bfa); -webkit-background-clip: text; background-clip: text; }
+.krv[data-model^="fusao"] .krv-mode-bar { display: block; position: absolute; left: 0; bottom: 0; height: 2px; width: calc(var(--share) * 100%); background: linear-gradient(90deg, #5eead4, #a78bfa); opacity: .8; }
+.krv[data-model^="fusao"] .krv-mode.is-on { background: linear-gradient(135deg, rgba(14, 165, 233, .35), rgba(139, 92, 246, .35)); border-color: rgba(165, 243, 252, .7); box-shadow: 0 0 22px rgba(56, 189, 248, .45); }
+.krv[data-model^="fusao"] .krv-place { padding: 5px 10px; border-left: 2px solid var(--c); background: linear-gradient(90deg, rgba(56, 189, 248, .1), transparent); }
+.krv[data-model^="fusao"] .krv-unfold-line { position: absolute; z-index: 7; opacity: 0; pointer-events: none; }
+.krv[data-model^="fusao"] .krv-holo-beam { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; z-index: 7; opacity: 0; pointer-events: none; background: linear-gradient(90deg, transparent, #a5f3fc, transparent); box-shadow: 0 0 24px 6px rgba(34, 211, 238, .55); }
+.krv[data-model^="fusao"] .krv-map .leaflet-tile-pane { mix-blend-mode: screen; }
+.krv[data-model^="fusao"].is-in .krv-side > * { animation: krv-rise .5s calc(var(--start, .7s) + var(--d, 0s)) cubic-bezier(.2, 1.2, .3, 1) both; }
+.krv[data-model^="fusao"].is-in .krv-side > :nth-child(2) { --d: .08s; }
+.krv[data-model^="fusao"].is-in .krv-side > :nth-child(3) { --d: .14s; }
+.krv[data-model^="fusao"].is-in .krv-mode { animation: krv-rise .45s calc(var(--start, .7s) + .2s + var(--i) * 60ms) cubic-bezier(.2, 1.2, .3, 1) both; }
+/* linhas de varredura do holograma por cima de tudo */
+.krv[data-model^="fusao"]::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: inherit; background: repeating-linear-gradient(0deg, rgba(165, 243, 252, .045) 0 1px, transparent 1px 4px); }
+
+/* Fusão 1 · Vidro holográfico: o cartão do Cockpit vira vidro quase transparente, projetado de baixo para cima */
+.krv[data-model="fusao1"] { border-radius: 22px; background: linear-gradient(160deg, rgba(165, 243, 252, .10), rgba(255, 255, 255, .01) 45%), rgba(8, 20, 36, .32);
+  border: 1px solid var(--edge); box-shadow: 0 0 0 1px rgba(139, 92, 246, .18) inset, 0 0 50px rgba(56, 189, 248, .18); --start: .9s; }
+.krv[data-model="fusao1"] .krv-map-wrap { border-right: 1px solid var(--edge); }
+.krv[data-model="fusao1"] .krv-map { -webkit-mask: radial-gradient(ellipse 60% 60% at 50% 50%, #000 70%, transparent 100%); mask: radial-gradient(ellipse 60% 60% at 50% 50%, #000 70%, transparent 100%); }
+.krv[data-model="fusao1"].is-in { animation: krv-project 1.1s cubic-bezier(.5, 0, .2, 1) both, krv-flicker 1.4s steps(1, end) both; }
+.krv[data-model="fusao1"].is-in .krv-holo-beam { animation: krv-beam 1.1s cubic-bezier(.5, 0, .2, 1) both; }
+
+/* Fusão 2 · Mapa solto + coluna de vidro: o mapa flutua sem moldura, a coluna é um cartão do Cockpit à parte */
+.krv[data-model="fusao2"] { gap: 22px; --start: 1s; }
+.krv[data-model="fusao2"]::after { display: none; }
+.krv[data-model="fusao2"] .krv-map-wrap::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(165, 243, 252, .05) 0 1px, transparent 1px 4px);
+  -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); }
+.krv[data-model="fusao2"] .krv-map { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); }
+.krv[data-model="fusao2"] .krv-side { border-radius: 22px; background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .01) 40%), rgba(10, 14, 32, .88); border: 1px solid var(--edge);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 40px rgba(56, 189, 248, .18); align-self: center; }
+.krv[data-model="fusao2"] .krv-close { right: 12px; top: 12px; }
+.krv[data-model="fusao2"].is-in { opacity: 1; }
+.krv[data-model="fusao2"].is-in .krv-map-wrap { animation: krv-project 1s cubic-bezier(.5, 0, .2, 1) both, krv-flicker 1.3s steps(1, end) both; }
+.krv[data-model="fusao2"].is-in .krv-holo-beam { right: auto; width: 60%; animation: krv-beam 1s cubic-bezier(.5, 0, .2, 1) both; }
+.krv[data-model="fusao2"].is-in .krv-side { animation: krv-slide-in .7s .55s cubic-bezier(.2, 1.15, .3, 1) both; }
+@keyframes krv-slide-in { from { opacity: 0; transform: translateX(60px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* Fusão 3 · HUD lateral: sem caixa nenhuma; a coluna do Cockpit vira uma faixa de HUD com régua e linha de luz */
+.krv[data-model="fusao3"] { --accent: #a78bfa; --hot: #e9d5ff; --edge: rgba(196, 181, 253, .3); --start: .8s; }
+.krv[data-model="fusao3"]::after { -webkit-mask: radial-gradient(ellipse 50% 50% at 35% 50%, #000 55%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 35% 50%, #000 55%, transparent 100%); }
+.krv[data-model="fusao3"] .krv-map { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, transparent 100%); }
+.krv[data-model="fusao3"] .krv-side { padding-left: 26px; background: linear-gradient(90deg, rgba(10, 6, 24, .6), transparent); }
+.krv[data-model="fusao3"] .krv-side::before { content: ""; position: absolute; left: 0; top: 6%; bottom: 6%; width: 2px; background: linear-gradient(180deg, transparent, #a5f3fc, #a78bfa, transparent); box-shadow: 0 0 14px #67e8f9; }
+.krv[data-model="fusao3"] .krv-mode { border-radius: 0; background: transparent; border-bottom: 1px solid rgba(196, 181, 253, .14); padding: 8px 4px; font-family: var(--mono); }
+.krv[data-model="fusao3"] .krv-mode.is-on { background: linear-gradient(90deg, rgba(139, 92, 246, .35), transparent); border-color: transparent; border-left: 2px solid #a5f3fc; box-shadow: none; }
+.krv[data-model="fusao3"] .krv-zoom-btn, .krv[data-model="fusao3"] .krv-close { border-radius: 2px; }
+.krv[data-model="fusao3"] .krv-unfold-line { top: 0; bottom: 0; left: 50%; width: 2px; background: linear-gradient(180deg, transparent, #a5f3fc, #a78bfa, transparent); box-shadow: 0 0 20px #67e8f9; }
+.krv[data-model="fusao3"].is-in { animation: krv-open-x .8s .15s cubic-bezier(.7, 0, .2, 1) both, krv-flicker 1.2s steps(1, end) both; }
+.krv[data-model="fusao3"].is-in .krv-unfold-line { animation: krv-line-v .95s ease both; }
+@keyframes krv-open-x { from { clip-path: inset(0 49.8% 0 49.8%); } to { clip-path: inset(-10% -10% -10% -10%); } }
+@keyframes krv-line-v { 0% { opacity: 0; transform: scaleY(0); } 25% { opacity: 1; transform: scaleY(1); } 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Fusão 4 · Cartão com mapa vazando: coluna em cartão escuro do Cockpit, o mapa holográfico sai das bordas */
+.krv[data-model="fusao4"] { border-radius: 24px; --start: .85s; }
+.krv[data-model="fusao4"]::after { inset: -30px auto -30px -60px; width: 62%; -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%); }
+.krv[data-model="fusao4"] .krv-map-wrap { margin: -40px 0 -40px -60px; }
+.krv[data-model="fusao4"] .krv-map { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%); mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%); }
+.krv[data-model="fusao4"] .krv-zoom { left: 80px; top: 60px; }
+.krv[data-model="fusao4"] .krv-side { border-radius: 22px; background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .01) 40%), rgba(14, 8, 30, .9); border: 1px solid rgba(196, 160, 255, .3);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 50px rgba(168, 85, 247, .22); }
+.krv[data-model="fusao4"] .krv-unfold-line { left: 59%; right: 0; top: 50%; height: 2px; background: linear-gradient(90deg, transparent, #f0abfc, #5eead4, transparent); box-shadow: 0 0 20px #f0abfc; }
+.krv[data-model="fusao4"].is-in { opacity: 1; }
+.krv[data-model="fusao4"].is-in .krv-side { animation: krv-unfold .75s .2s cubic-bezier(.7, 0, .2, 1) both; }
+.krv[data-model="fusao4"].is-in .krv-unfold-line { animation: krv-line-flash .9s ease both; }
+.krv[data-model="fusao4"].is-in .krv-map-wrap { animation: krv-project 1.1s .35s cubic-bezier(.5, 0, .2, 1) both, krv-flicker 1.5s .35s steps(1, end) both; }
+.krv[data-model="fusao4"].is-in .krv-holo-beam { right: 41%; left: -60px; animation: krv-beam 1.1s .35s cubic-bezier(.5, 0, .2, 1) both; }
+
+@media (max-width: 760px) {
+  .krv[data-model^="fusao"] { grid-template-columns: 1fr; grid-template-rows: 280px auto; }
+  .krv[data-model="fusao4"] .krv-map-wrap { margin: 0; }
+  .krv[data-model^="fusao"] .krv-side { max-height: 46vh; }
+}
+
+.krv[data-model^="fusao"] .krv-mode { padding: 5px 9px; }
+.krv[data-model^="fusao"] .krv-place { padding: 3px 9px; }

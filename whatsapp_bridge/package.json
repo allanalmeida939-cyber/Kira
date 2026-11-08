@@ -1,0 +1,17 @@
+{
+  "name": "kira-whatsapp-bridge",
+  "private": true,
+  "type": "module",
+  "description": "Bridge do WhatsApp da Kira (Baileys, sem navegador). HTTP local nas portas 5050 e 5100.",
+  "main": "bridge.mjs",
+  "scripts": {
+    "start": "node bridge.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "pino": "10.4.0",
+    "qrcode": "1.5.4"
+  }
+}

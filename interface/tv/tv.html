@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;400;700&family=Chakra+Petch:wght@400;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,700;6..96,900&family=Source+Serif+4:ital,wght@0,400;1,400&family=Outfit:wght@100;300&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="/assets/css/windowing.css">
+<link rel="stylesheet" href="/assets/css/godseye.css">
+<link rel="stylesheet" href="/assets/css/godseye-themes.css">
+<link rel="stylesheet" href="/assets/css/route-view.css">
+<link rel="stylesheet" href="/assets/css/route-intros.css">
+<link rel="stylesheet" href="/static/tv.css">
+<style>html, body { margin: 0; height: 100%; overflow: hidden; background: #000; cursor: none; }</style>
+</head>
+<body>
+<div class="ktv-stage" id="stage"></div>
+<!-- Orbe da Kira (mesmo da tela principal). Navegador sem módulo: tv.js usa o orbe embutido. -->
+<script type="module">
+import { createCloudRenderer, createGeoHiveRenderer, createVoxelRenderer } from '/static/orbRenderersV2.js';
+window.KiraOrbRenderers = { createCloudRenderer, createGeoHiveRenderer, createVoxelRenderer };
+if (window.KiraTVApi) window.KiraTVApi.setModel(window.KiraTVApi.model); // refaz o orbe com o renderer de verdade
+</script>
+<script src="/static/tv.js"></script>
+<script>
+(function () {
+  var q = {}; location.search.replace(/^\?/, '').split('&').forEach(function (kv) { var p = kv.split('='); if (p[0]) q[p[0]] = decodeURIComponent(p[1] || ''); });
+  var stage = document.getElementById('stage');
+  function fit() { var k = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = 'translate(' + ((innerWidth - 1920 * k) / 2) + 'px,' + ((innerHeight - 1080 * k) / 2) + 'px) scale(' + k + ')'; }
+  fit(); addEventListener('resize', fit);
+  var api = window.KiraTVApi = KiraTV.mount(stage, { modelo: Number(q.modelo) || 1, demo: q.demo === '1' });
+  if (q.demo !== '1') KiraTV.connect(api);
+  document.addEventListener('visibilitychange', function () { api.setVisible(!document.hidden); });
+})();
+</script>
+<script src="/static/livekit-client.umd.min.js"></script>
+<script src="/static/tvAudio.js"></script>
+<script src="/static/tvKeepAwake.js"></script>
+<!-- a MESMA Kira do PC: painéis, Olho de Deus e rota com os módulos do PC (tvKira.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/assets/js/ui/routeIntros.js" defer></script>
+<script src="/assets/js/ui/routeView.js" defer></script>
+<script type="module" src="/static/tvKira.js"></script>
+</body>
+</html>

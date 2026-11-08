@@ -1,0 +1,34 @@
+# Chaves e dados pessoais: NUNCA sobem
+.env
+/configs/secure/
+/configs/*.json
+!/configs/desktop_operator_config.json
+!/configs/economy_mode.json
+!/configs/kira_features.json
+/memory/
+/data/
+/logs/
+/logs_whatsapp/
+/runtime/
+/cache/
+/outputs/
+/artifacts/
+/backups/
+/restore_points/
+/musics/
+whatsapp/kira_session/
+agent/venv/
+agent/learning/data/*.json
+agent/configs/voice_profiles/
+/models/
+*.sqlite
+*.sqlite3*
+*.db
+*.jsonl
+*.log
+# baixados pelo INSTALAR.bat
+/bin/
+livekit/livekit-server.exe
+node_modules/
+__pycache__/
+*.pyc

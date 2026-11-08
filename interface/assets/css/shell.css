@@ -1,0 +1,325 @@
+/* Fase 3: new UI is completely inert until .kui-* is mounted by the flag-gated bootstrap. */
+.kui-readiness-badge {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 8201;
+  padding: 7px 12px;
+  color: #f5d0fe;
+  font: 700 10px/1 var(--font-ui, "Bahnschrift", sans-serif);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: rgba(13, 8, 31, .88);
+  border: 1px solid rgba(192, 132, 252, .45);
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(168, 85, 247, .2);
+  transform: translateX(-50%);
+  transition: opacity .4s ease;
+}
+.kui-readiness-badge.is-fading { opacity: 0; }
+.kui-readiness-badge[hidden] { display: none !important; }
+.kui-readiness-badge[data-state="ready"] {
+  color: #b8ffd9;
+  border-color: rgba(84, 230, 167, .65);
+  box-shadow: 0 0 18px rgba(84, 230, 167, .22);
+}
+.kui-readiness-badge[data-state="recovering"] {
+  color: #ffe9b8;
+  border-color: rgba(251, 191, 36, .65);
+  box-shadow: 0 0 18px rgba(251, 191, 36, .22);
+}
+.kui-readiness-badge[data-state="error"] {
+  color: #ffd0d8;
+  border-color: rgba(248, 113, 113, .65);
+  box-shadow: 0 0 18px rgba(248, 113, 113, .2);
+}
+
+:root { --kui-rail-width: 64px; --kui-rail-open-width: 236px; }
+.kui-sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 8190;
+  display: flex;
+  flex-direction: column;
+  width: var(--kui-rail-width);
+  padding: 10px 9px 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  color: #f1e7ff;
+  background: linear-gradient(180deg, rgba(34, 17, 72, .94), rgba(9, 7, 28, .96));
+  border-right: 1px solid rgba(192, 132, 252, .45);
+  box-shadow: 0 0 30px rgba(139, 92, 246, .18), inset -1px 0 0 rgba(255, 255, 255, .04);
+  transition: width 200ms ease, box-shadow 200ms ease;
+}
+.kui-sidebar::-webkit-scrollbar { display: none; }
+.kui-sidebar[hidden] { display: none !important; }
+.kui-sidebar.is-open { width: var(--kui-rail-open-width); box-shadow: 14px 0 44px rgba(0, 0, 0, .45), 0 0 34px rgba(139, 92, 246, .22); }
+.kui-hamburger {
+  flex: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  padding: 0 10px;
+  color: #edc9ff;
+  cursor: pointer;
+  background: rgba(80, 35, 136, .38);
+  border: 1px solid rgba(192, 132, 252, .5);
+  border-radius: 12px;
+  transition: color 160ms ease, background 160ms ease;
+}
+.kui-hamburger:hover, .kui-hamburger:focus-visible { color: #fff; background: rgba(110, 50, 180, .6); outline: none; }
+.kui-sidebar-section { flex: none; margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(192, 132, 252, .2); }
+.kui-sidebar-section h3 { max-height: 0; margin: 0; overflow: hidden; color: #b895d5; font: 700 9px "Orbitron", sans-serif; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; opacity: 0; transition: opacity 160ms ease, max-height 160ms ease, margin 160ms ease; }
+.kui-sidebar.is-open .kui-sidebar-section h3 { max-height: 20px; margin: 0 4px 5px; opacity: 1; }
+.kui-sidebar-action { display: flex; align-items: center; gap: 12px; width: 100%; height: 42px; padding: 0 10px; overflow: hidden; color: #e8d8f7; text-align: left; cursor: pointer; background: transparent; border: 1px solid transparent; border-radius: 11px; transition: color 140ms ease, background 140ms ease, border-color 140ms ease; }
+.kui-sidebar-action:hover, .kui-sidebar-action:focus-visible { color: #fff; background: rgba(139, 92, 246, .26); border-color: rgba(192, 132, 252, .4); outline: none; }
+.kui-sidebar-action:disabled { color: #756581; cursor: not-allowed; opacity: .62; }
+.kui-rail-icon { flex: none; display: grid; place-items: center; width: 22px; height: 22px; }
+.kui-rail-icon svg { width: 22px; height: 22px; }
+.kui-sidebar-action-name, .kui-sidebar-action-meta { max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: opacity 160ms ease, max-width 200ms ease; }
+.kui-sidebar-action-name { font: 600 12px var(--font-ui, "Bahnschrift", sans-serif); text-overflow: ellipsis; }
+.kui-sidebar-action-meta { margin-left: auto; color: #aa8fc0; font: 9px var(--font-ui, "Bahnschrift", sans-serif); }
+.kui-sidebar.is-open .kui-sidebar-action-name { max-width: 150px; opacity: 1; }
+.kui-sidebar.is-open .kui-sidebar-action-meta { max-width: 60px; opacity: 1; }
+body:has(.app-shell[data-ui-stage="main"]) .left-panels { left: calc(var(--kui-rail-width) + 20px); }
+
+.kui-command-palette { position: fixed; top: 16vh; left: 50%; z-index: 8300; width: min(540px, calc(100vw - 32px)); max-height: 66vh; padding: 18px; overflow: auto; color: #f4eaff; background: rgba(13, 8, 31, .97); border: 1px solid rgba(216, 156, 255, .58); border-radius: 16px; box-shadow: 0 24px 70px rgba(0, 0, 0, .62), 0 0 35px rgba(168, 85, 247, .24); transform: translateX(-50%); }
+.kui-command-palette[hidden] { display: none !important; }
+.kui-command-palette h2 { margin: 0 0 12px; color: #e9b7ff; font: 700 13px "Orbitron", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.kui-command-input { box-sizing: border-box; width: 100%; padding: 11px 12px; color: #fff; background: rgba(4, 3, 17, .8); border: 1px solid rgba(192, 132, 252, .44); border-radius: 9px; outline: none; }
+.kui-command-input:focus { border-color: #e6aaff; box-shadow: 0 0 0 3px rgba(192, 132, 252, .13); }
+.kui-command-results { display: grid; gap: 4px; margin-top: 12px; }
+
+/* Chat da Kira: o mesmo padrão das Configurações (moldura com brilho roxo, cabeçalho com ícone, pílulas, cartões). */
+.kui-chat-overlay { position: fixed; inset: 0; z-index: 8100; display: flex; align-items: stretch; justify-content: center; padding: 22px 28px 22px 96px; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at 50% 0%, rgba(88, 28, 135, .22), transparent 55%), #07040f; transition: opacity 180ms ease; }
+.kui-chat-overlay[data-active="true"] { opacity: 1; pointer-events: auto; }
+.kui-chat-overlay[data-active="false"] { visibility: hidden; }
+.kui-chat-overlay[data-active="false"] .kui-chat-card { visibility: hidden; pointer-events: none; }
+.kui-chat-card { position: relative; display: flex; flex-direction: column; width: min(940px, 100%); height: 100%; min-height: 0; overflow: hidden; pointer-events: auto; color: #eee7ff; background: radial-gradient(ellipse at 18% 0%, rgba(88, 28, 135, .55) 0%, transparent 50%), radial-gradient(ellipse at 85% 100%, rgba(30, 20, 70, .5) 0%, transparent 48%), rgba(6, 4, 16, .96); border: 1px solid rgba(139, 92, 246, .42); border-radius: 18px; box-shadow: 0 0 0 1px rgba(139, 92, 246, .14), 0 24px 60px rgba(0, 0, 0, .6), 0 0 40px rgba(139, 92, 246, .18); }
+.kui-chat-icon { width: 16px; height: 16px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* cabeçalho */
+.kui-chat-header { display: flex; align-items: center; gap: 12px; padding: 18px 22px 14px; border-bottom: 1px solid rgba(139, 92, 246, .18); }
+.kui-chat-badge { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 auto; color: #f0abfc; background: linear-gradient(135deg, rgba(139, 92, 246, .55), rgba(88, 28, 135, .65)); border: 1px solid rgba(196, 181, 253, .28); border-radius: 10px; box-shadow: 0 0 14px rgba(139, 92, 246, .4); }
+.kui-chat-badge .kui-chat-icon { width: 20px; height: 20px; }
+.kui-chat-title-group { min-width: 0; margin-right: auto; }
+.kui-chat-title { margin: 0; color: #fff; font: 800 1.05rem/1 "Orbitron", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.kui-chat-subtitle { margin: 5px 0 0; color: rgba(196, 181, 253, .58); font-size: .74rem; }
+.kui-chat-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.kui-chat-runtime-status { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 0 12px; color: #d8c8ee; font-size: .72rem; font-weight: 700; white-space: nowrap; background: rgba(12, 8, 26, .9); border: 1px solid rgba(139, 92, 246, .28); border-radius: 999px; }
+.kui-chat-status-dot { width: 7px; height: 7px; background: #58e7aa; border-radius: 50%; box-shadow: 0 0 10px #58e7aa; }
+.kui-chat-overlay.is-busy .kui-chat-status-dot { background: #eab3ff; box-shadow: 0 0 12px #eab3ff; animation: kui-pulse 1s ease-in-out infinite; }
+.kui-chat-overlay.is-speaking .kui-chat-status-dot { background: #f0abfc; box-shadow: 0 0 12px #f0abfc; }
+.kui-chat-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 13px; color: #e9d5ff; font-weight: 700; font-size: .72rem; line-height: 1; font-family: inherit; letter-spacing: .02em; cursor: pointer; background: rgba(67, 34, 109, .45); border: 1px solid rgba(139, 92, 246, .38); border-radius: 999px; transition: background .16s ease, border-color .16s ease, color .16s ease; }
+.kui-chat-chip:hover { color: #fff; background: rgba(124, 58, 237, .4); border-color: rgba(196, 181, 253, .6); }
+.kui-chat-chip.is-danger { color: #fecaca; background: rgba(239, 68, 68, .1); border-color: rgba(239, 68, 68, .42); }
+.kui-chat-chip.is-danger:hover { color: #fff; background: rgba(239, 68, 68, .24); border-color: rgba(239, 68, 68, .75); }
+.kui-chat-close { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; color: #e9d5ff; cursor: pointer; background: rgba(12, 8, 26, .9); border: 1px solid rgba(139, 92, 246, .38); border-radius: 50%; transition: background .16s ease, border-color .16s ease; }
+.kui-chat-close:hover, .kui-chat-close:focus-visible { color: #fff; background: rgba(124, 58, 237, .35); border-color: rgba(196, 181, 253, .7); outline: none; }
+.kui-chat-chip:focus-visible, .kui-chat-send:focus-visible, .kui-chat-go-end:focus-visible { outline: 2px solid #d8b4fe; outline-offset: 2px; }
+
+/* busca */
+.kui-chat-tools { display: flex; align-items: center; gap: 12px; padding: 12px 22px 10px; border-bottom: 1px solid rgba(139, 92, 246, .1); }
+.kui-chat-search-box { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; padding: 0 12px; color: rgba(196, 181, 253, .7); background: rgba(12, 8, 26, .9); border: 1px solid rgba(139, 92, 246, .28); border-radius: 9px; transition: border-color .16s ease, box-shadow .16s ease; }
+.kui-chat-search-box:focus-within { border-color: rgba(216, 156, 255, .8); box-shadow: 0 0 0 3px rgba(168, 85, 247, .14); }
+.kui-chat-search { flex: 1 1 auto; min-width: 0; padding: 9px 0; color: #e9d5ff; font-size: .8rem; font-family: inherit; background: transparent; border: 0; outline: none; }
+.kui-chat-search::placeholder { color: rgba(196, 181, 253, .45); }
+.kui-chat-count { flex: 0 0 auto; color: rgba(196, 181, 253, .55); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+/* mensagens */
+.kui-chat-messages { flex: 1 1 auto; box-sizing: border-box; min-height: 0; padding: 18px 22px 10px; overflow: auto; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: rgba(139, 92, 246, .3) transparent; }
+.kui-chat-empty { display: grid; justify-items: center; gap: 10px; margin: 40px auto; padding: 28px 24px; max-width: 360px; color: rgba(196, 181, 253, .6); text-align: center; background: radial-gradient(ellipse at 50% 0%, rgba(88, 28, 135, .16), transparent 65%), rgba(10, 8, 22, .88); border: 1px solid rgba(139, 92, 246, .2); border-radius: 14px; }
+.kui-chat-empty strong { color: #e9d5ff; font: 800 .82rem "Orbitron", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.kui-chat-empty p { margin: 0; font-size: .74rem; }
+.kui-chat-message { display: flex; flex-direction: column; max-width: 78%; margin: 0 0 14px; }
+.kui-chat-message.is-user { margin-left: auto; align-items: flex-end; }
+.kui-chat-message.is-system { max-width: 100%; align-items: center; }
+.kui-chat-message-meta { display: flex; align-items: center; gap: 7px; margin: 0 0 6px; color: rgba(196, 181, 253, .88); font: 800 .66rem "Orbitron", sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.kui-chat-message.is-user .kui-chat-message-meta { flex-direction: row-reverse; }
+.kui-chat-avatar { width: 24px; height: 24px; object-fit: cover; border: 1px solid rgba(216, 156, 255, .6); border-radius: 50%; box-shadow: 0 0 10px rgba(168, 85, 247, .35); }
+.kui-chat-source { padding: 2px 7px; color: rgba(196, 181, 253, .75); font-weight: 700; font-size: .58rem; line-height: 1.4; font-family: inherit; letter-spacing: .1em; background: rgba(12, 8, 26, .9); border: 1px solid rgba(139, 92, 246, .3); border-radius: 999px; }
+.kui-chat-time { color: rgba(196, 181, 253, .45); font-weight: 600; font-size: .62rem; font-family: inherit; letter-spacing: .04em; }
+.kui-chat-bubble { position: relative; padding: 12px 14px; color: #ede5f7; font-size: .8rem; line-height: 1.55; background: radial-gradient(ellipse at 0% 0%, rgba(88, 28, 135, .2), transparent 60%), rgba(14, 10, 30, .92); border: 1px solid rgba(139, 92, 246, .26); border-radius: 14px 14px 14px 4px; }
+.kui-chat-message.is-user .kui-chat-bubble { background: linear-gradient(135deg, rgba(124, 58, 237, .32), rgba(88, 28, 135, .38)); border-color: rgba(196, 181, 253, .36); border-radius: 14px 14px 4px 14px; }
+.kui-chat-message.is-system .kui-chat-bubble { padding: 7px 14px; color: rgba(196, 181, 253, .7); font-size: .72rem; background: rgba(12, 8, 26, .7); border-style: dashed; border-radius: 999px; }
+.kui-chat-message.is-system .kui-chat-message-meta { display: none; }
+.kui-chat-message.is-partial .kui-chat-bubble { border-color: rgba(240, 171, 252, .7); box-shadow: 0 0 14px rgba(192, 132, 252, .18); }
+.kui-chat-text { min-width: 0; }
+.kui-chat-paragraph { margin: 0 0 8px; white-space: pre-wrap; }
+.kui-chat-paragraph:last-child { margin-bottom: 0; }
+.kui-chat-bubble mark { color: #1a0b2e; background: #f0abfc; border-radius: 3px; }
+.kui-chat-bubble a { color: #89d8ff; text-decoration: underline; }
+.kui-chat-bubble code { padding: 1px 5px; color: #ffc9ff; background: rgba(0, 0, 0, .3); border-radius: 5px; }
+.kui-chat-list { margin: 0 0 8px; padding-left: 21px; }
+.kui-chat-code { margin: 8px 0; overflow: hidden; background: rgba(2, 2, 12, .8); border: 1px solid rgba(139, 92, 246, .28); border-radius: 10px; }
+.kui-chat-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 10px; color: rgba(196, 181, 253, .7); font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid rgba(139, 92, 246, .18); }
+.kui-chat-code pre { margin: 0; padding: 10px 12px; overflow: auto; font: .72rem/1.45 Consolas, monospace; white-space: pre-wrap; }
+.kui-chat-copy { padding: 3px 9px; color: #e9d5ff; font-weight: 700; font-size: .62rem; font-family: inherit; cursor: pointer; background: rgba(67, 34, 109, .45); border: 1px solid rgba(139, 92, 246, .38); border-radius: 999px; }
+.kui-chat-message-copy { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; color: #e9d5ff; cursor: pointer; background: rgba(12, 8, 26, .92); border: 1px solid rgba(139, 92, 246, .35); border-radius: 7px; opacity: 0; transition: opacity .14s ease; }
+.kui-chat-message-copy .kui-chat-icon { width: 13px; height: 13px; }
+.kui-chat-message:hover .kui-chat-message-copy, .kui-chat-message-copy:focus-visible, .kui-chat-message-copy.is-done { opacity: 1; }
+.kui-chat-message-copy.is-done { color: #b8ffd9; border-color: rgba(88, 231, 170, .5); }
+.kui-chat-message.is-system .kui-chat-message-copy { display: none; }
+.kui-chat-go-end { position: absolute; right: 26px; bottom: 96px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; color: #fff; font-weight: 700; font-size: .7rem; font-family: inherit; cursor: pointer; background: linear-gradient(135deg, #7c3aed, #a21caf); border: 1px solid rgba(225, 183, 255, .5); border-radius: 999px; box-shadow: 0 6px 18px rgba(124, 58, 237, .35); }
+.kui-chat-go-end[hidden] { display: none; }
+.kui-chat-error { margin: 0 22px 8px; color: #fca5a5; font-size: .74rem; }
+
+/* escrever */
+.kui-chat-composer { display: flex; align-items: stretch; gap: 10px; padding: 12px 22px 18px; border-top: 1px solid rgba(139, 92, 246, .18); background: rgba(6, 4, 16, .6); }
+.kui-chat-input { flex: 1; resize: none; min-height: 44px; max-height: 160px; padding: 11px 13px; color: #f3ecff; font-size: .82rem; line-height: 1.45; font-family: inherit; background: rgba(12, 8, 26, .92); border: 1px solid rgba(139, 92, 246, .32); border-radius: 12px; outline: none; transition: border-color .16s ease, box-shadow .16s ease; }
+.kui-chat-input::placeholder { color: rgba(196, 181, 253, .45); }
+.kui-chat-input:focus { border-color: rgba(216, 156, 255, .85); box-shadow: 0 0 0 3px rgba(168, 85, 247, .16); }
+.kui-chat-send { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 104px; padding: 0 16px; color: #fff; font: 800 .72rem "Orbitron", sans-serif; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; background: linear-gradient(135deg, #7c3aed, #a21caf); border: 1px solid rgba(225, 183, 255, .5); border-radius: 12px; box-shadow: 0 6px 18px rgba(124, 58, 237, .32); transition: filter .14s ease; }
+.kui-chat-send:hover:not(:disabled) { filter: brightness(1.12); }
+.kui-chat-send:disabled { cursor: wait; opacity: .55; }
+/* com a página do chat aberta, o selo de prontidão e a barra de status da tela principal não cobrem a caixa de texto
+   (classe no body: um seletor body:has(...) fazia o navegador recalcular o estilo da página inteira a cada mudança) */
+body.kui-chat-open .kui-readiness-badge, body.kui-chat-open .kui-status-bar { display: none !important; }
+
+
+@keyframes kui-pulse { 50% { opacity: .38; transform: scale(.72); } }
+.kui-status-bar { position: fixed; left: 50%; bottom: 58px; z-index: 8201; display: grid; gap: 5px; min-width: 210px; max-width: min(360px, calc(100vw - 32px)); padding: 8px 12px; color: #f5d0fe; background: rgba(13, 8, 31, .88); border: 1px solid rgba(192, 132, 252, .4); border-radius: 999px; box-shadow: 0 0 18px rgba(168, 85, 247, .18); transform: translateX(-50%); opacity: 1; transition: opacity 180ms ease, transform 180ms ease; }
+.kui-status-bar[hidden] { display: none !important; }
+.kui-status-bar[data-state="thinking"], .kui-status-bar[data-state="searching"] { animation: kui-status-in 180ms ease-out; }
+.kui-status-bar-text { font: 700 10px/1.2 var(--font-ui, "Bahnschrift", sans-serif); letter-spacing: .08em; text-align: center; }
+.kui-status-bar-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 10px; margin: 0; padding: 0; color: #aa8fc0; font-size: 9px; list-style: none; }
+.kui-status-bar-steps .is-done { color: #b8ffd9; }
+@keyframes kui-status-in { from { opacity: 0; transform: translateX(-50%) translateY(5px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@media (max-width: 700px) {
+  .kui-chat-overlay { padding: 8px; }
+  .kui-chat-message { max-width: 94%; }
+  .kui-chat-header { flex-wrap: wrap; padding-inline: 13px; }
+  .kui-chat-actions { width: 100%; justify-content: flex-start; }
+  .kui-chat-messages, .kui-chat-tools, .kui-chat-composer { padding-inline: 13px; }
+  .kui-chat-send { min-width: 0; }
+  .kui-chat-send span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .kui-sidebar, .kui-sidebar-backdrop, .kui-chat-overlay, .kui-chat-status-dot, .kui-status-bar { transition: none; animation: none; } }
+
+.kui-panel-handle { cursor: grab; touch-action: none; }
+.kui-panel-handle:active, body.kui-panel-dragging .kui-panel-handle { cursor: grabbing; }
+body.kui-panel-dragging { user-select: none; }
+.kui-panel-grip { position: absolute; z-index: 5; touch-action: none; }
+.kui-panel-grip-n, .kui-panel-grip-s { left: 10px; right: 10px; height: 6px; cursor: ns-resize; }
+.kui-panel-grip-e, .kui-panel-grip-w { top: 10px; bottom: 10px; width: 6px; cursor: ew-resize; }
+.kui-panel-grip-n { top: 0; } .kui-panel-grip-s { bottom: 0; } .kui-panel-grip-e { right: 0; } .kui-panel-grip-w { left: 0; }
+.kui-panel-grip-ne, .kui-panel-grip-nw, .kui-panel-grip-se, .kui-panel-grip-sw { width: 12px; height: 12px; }
+.kui-panel-grip-ne { top: 0; right: 0; cursor: nesw-resize; } .kui-panel-grip-sw { bottom: 0; left: 0; cursor: nesw-resize; }
+.kui-panel-grip-nw { top: 0; left: 0; cursor: nwse-resize; } .kui-panel-grip-se { right: 0; bottom: 0; cursor: nwse-resize; }
+.side-png-button.kui-panel-handle { cursor: pointer; }
+
+/* Seção Janela: botão único "Nova janela" e cartões das janelas fixas (só com o menu aberto) */
+.kui-window-list { display: none; }
+.kui-sidebar.is-open .kui-window-list { display: grid; gap: 6px; margin-top: 6px; }
+.kui-window-card { display: grid; gap: 4px; padding: 7px 8px; color: #e8d8f7; background: rgba(139, 92, 246, .1); border: 1px solid rgba(192, 132, 252, .16); border-radius: 11px; font-size: 11px; contain: layout paint; }
+.kui-window-card.is-open { border-color: rgba(192, 132, 252, .4); }
+.kui-window-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.kui-window-name { flex: 1; min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.kui-window-state { color: #aa8fc0; font-size: 9px; }
+.kui-window-card.is-open .kui-window-state { color: #86efac; }
+.kui-window-empty { margin: 0; padding: 6px 8px; color: #aa8fc0; font-size: 11px; }
+.kui-window-more { display: grid; place-items: center; flex: 0 0 auto; width: 26px; height: 26px; padding: 0; color: #e8d8f7; cursor: pointer; background: transparent; border: 1px solid transparent; border-radius: 8px; }
+.kui-window-more svg { width: 16px; height: 16px; }
+.kui-window-more:hover, .kui-window-more:focus-visible, .kui-window-more[aria-expanded="true"] { background: rgba(139, 92, 246, .3); border-color: rgba(192, 132, 252, .4); outline: none; }
+.kui-window-menu { display: grid; gap: 2px; padding: 4px; background: rgba(12, 8, 30, .92); border: 1px solid rgba(192, 132, 252, .28); border-radius: 10px; animation: kui-menu-in 160ms ease-out; }
+@keyframes kui-menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.kui-window-mini { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; color: #f0d9ff; text-align: left; cursor: pointer; background: transparent; border: 0; border-radius: 7px; font: 11px var(--font-ui, "Bahnschrift", sans-serif); }
+.kui-window-mini svg { flex: 0 0 auto; width: 14px; height: 14px; }
+.kui-window-mini:hover, .kui-window-mini:focus-visible { background: rgba(139, 92, 246, .3); outline: none; }
+.kui-window-mini.is-on { color: #86efac; }
+.kui-window-mini.is-danger:hover, .kui-window-mini.is-danger:focus-visible { color: #fecdd3; background: rgba(190, 53, 108, .35); }
+.kui-window-input { box-sizing: border-box; flex: 1; min-width: 0; padding: 4px 7px; color: #f0d9ff; background: rgba(8, 6, 24, .8); border: 1px solid rgba(192, 132, 252, .5); border-radius: 7px; font: 11px var(--font-ui, "Bahnschrift", sans-serif); }
+.kui-window-input:focus { outline: none; border-color: rgba(232, 121, 249, .9); }
+@media (prefers-reduced-motion: reduce) { .kui-window-menu { animation: none; } }
+
+/* O pywebview abre a janela com text_select=False (body sem seleção, para os botões não ficarem azuis ao clicar).
+   Mensagens têm que dar para selecionar e copiar: transcrição da tela principal e o chat. */
+#left-transcription-messages, #left-transcription-messages *,
+.kui-chat-messages, .kui-chat-messages * { -webkit-user-select: text !important; user-select: text !important; cursor: text; }
+.kui-chat-messages button, .kui-chat-messages button * { -webkit-user-select: none !important; user-select: none !important; cursor: pointer; }
+
+/* Configurações abertas: só a aba fica na frente; tudo atrás (menu, painéis, orbe, botões) embaçado e escuro. */
+/* A aba mora dentro do .app-shell (z-index 1): não dá para subir acima do menu. Então o fundo da aba escurece e embaça
+   o que está dentro do app, e o que fica fora dele (menu, botões laterais, barra de status) é embaçado direto. */
+body.kira-settings-focus #drawer-backdrop.open { background: rgba(4, 2, 10, 0.55); backdrop-filter: blur(10px) saturate(0.8); -webkit-backdrop-filter: blur(10px) saturate(0.8); }
+body.kira-settings-focus :is(.kui-sidebar, .kui-rail, .kui-status-bar, .kui-readiness-badge, #drawer-config-btn-float, #drawer-reminders-btn-float),
+body.kira-settings-focus:has(#config-drawer.open) :is(#drawer-whatsapp-btn-float, #drawer-nav-btn-float, #drawer-music-btn-float) {
+  filter: blur(6px) brightness(0.35) saturate(0.7) !important; pointer-events: none !important; transition: filter 0.3s ease;
+}
+
+/* Olho de Deus aberto: tudo atrás fica invisível (não é pintado nem animado); só o globo trabalha. */
+body.kira-godseye-open :is(.app-shell, .kui-sidebar, .kui-window-layer, .kui-status-bar, .kira-live-previews, .side-png-button) { visibility: hidden !important; }
+
+/* Desempenho (2026-10-31). Menu: a largura muda numa camada própria (contain) para não recalcular a tela inteira a
+   cada quadro. Chat aberto (fundo sólido por cima): a tela principal fica invisível e para de ser pintada. */
+.kui-sidebar { contain: layout paint; will-change: width; }
+.kui-chat-overlay { will-change: opacity; }
+html:not([data-kira-chat="orbe"]) body.kui-chat-open .app-shell { visibility: hidden; }
+
+/* Barra do topo é invisível e larga: deixa o mouse passar para o painel arrastado até lá (só logo/status/relógio pegam clique). */
+.app-shell .app-header { pointer-events: none !important; }
+.app-header > * { pointer-events: auto; }
+/* Thinking Orbs: mini-orbe do estágio da tarefa, abaixo do relógio */
+#kira-activity-orb { position: fixed; top: 92px; left: 50%; transform: translateX(-50%); z-index: 60; padding: 4px 12px 4px 6px; border-radius: 99px; background: rgba(12, 6, 26, .78); border: 1px solid rgba(192, 132, 252, .35); box-shadow: 0 0 16px rgba(168, 85, 247, .3); color: #f3e8ff; font: 600 12px var(--font-ui, "Segoe UI", sans-serif); pointer-events: none; }
+#kira-activity-orb[hidden] { display: none !important; }
+/* radar do indicador: varredura + pulso só com transform/opacity (barato na GPU) */
+#kira-activity-orb::before, #kira-activity-orb::after { content: ""; position: absolute; left: 6px; top: 50%; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; pointer-events: none; }
+#kira-activity-orb::before { background: conic-gradient(from 0deg, rgba(34, 211, 238, 0) 0 70%, rgba(34, 211, 238, .55) 96%, rgba(217, 70, 239, .9)); -webkit-mask: radial-gradient(circle, transparent 54%, #000 56%); mask: radial-gradient(circle, transparent 54%, #000 56%); animation: kira-radar-sweep 1.6s linear infinite; }
+#kira-activity-orb::after { border: 1px solid rgba(192, 132, 252, .7); animation: kira-radar-ping 1.8s ease-out infinite; }
+#kira-activity-orb[data-state="respirando"]::before { animation-duration: 4s; opacity: .45; }
+#kira-activity-orb[data-state="respirando"]::after { animation: none; opacity: .25; }
+#kira-activity-orb { animation: kira-chip-in .22s ease-out; }
+@keyframes kira-radar-sweep { to { transform: rotate(360deg); } }
+@keyframes kira-radar-ping { 0% { transform: scale(.7); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes kira-chip-in { from { opacity: 0; transform: translateX(-50%) translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { #kira-activity-orb::before { animation-duration: 3.2s; } #kira-activity-orb::after { animation-duration: 3.6s; } }
+
+/* tela de bloqueio da Kira (Fase 5) */
+.kira-lock { position: fixed; inset: 0; z-index: 2147483000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: radial-gradient(circle at 50% 38%, rgba(88, 28, 135, 0.55), rgba(5, 2, 14, 0.97) 60%); backdrop-filter: blur(22px); color: #f5f3ff;
+  font-family: var(--font-ui, sans-serif); opacity: 0; transition: opacity 0.5s ease; }
+.kira-lock.is-on { opacity: 1; }
+.kira-lock[hidden] { display: none; }
+.kira-lock-rings { position: relative; width: 260px; height: 260px; display: grid; place-items: center; }
+.kira-lock-rings i { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(217, 70, 239, 0.45); box-shadow: 0 0 24px rgba(168, 85, 247, 0.35);
+  animation: kira-lock-spin 9s linear infinite; border-top-color: transparent; }
+.kira-lock-rings i:nth-child(2) { inset: 18px; animation-duration: 6s; animation-direction: reverse; border-right-color: transparent; }
+.kira-lock-rings i:nth-child(3) { inset: -18px; animation-duration: 14s; opacity: 0.5; }
+.kira-lock-clock { font-size: 3.4rem; font-weight: 200; letter-spacing: 0.06em; text-shadow: 0 0 24px rgba(217, 70, 239, 0.6); }
+.kira-lock-date { opacity: 0.7; text-transform: capitalize; margin-top: -10px; }
+.kira-lock-form { display: flex; gap: 6px; }
+.kira-lock-pass { width: 240px; padding: 11px 16px; border-radius: 999px; border: 1px solid rgba(217, 70, 239, 0.5); background: rgba(0, 0, 0, 0.4); color: inherit; font: inherit; outline: none; }
+.kira-lock-pass:focus { box-shadow: 0 0 20px rgba(217, 70, 239, 0.5); }
+.kira-lock-go, .kira-lock-talk, .kira-lock-face { border-radius: 999px; border: 1px solid rgba(217, 70, 239, 0.5); background: rgba(168, 85, 247, 0.25); color: inherit; font: inherit; padding: 8px 16px; cursor: pointer; }
+.kira-lock-face:disabled { opacity: 0.45; cursor: not-allowed; }
+.kira-lock-row { display: flex; gap: 8px; }
+.kira-lock-msg { min-height: 1.2em; color: #fca5a5; font-size: 0.85rem; }
+.kira-lock-mic { opacity: 0.75; font-size: 0.85rem; letter-spacing: 0.04em; }
+.kira-lock-mic.is-on { opacity: 1; color: #6ee7b7; text-shadow: 0 0 14px #34d399; }
+.kira-lock.is-shake .kira-lock-form { animation: kira-lock-shake 0.4s; }
+.kira-lock.is-leaving { opacity: 0; transition: opacity 1.2s ease 0.2s; }
+.kira-lock.is-leaving .kira-lock-rings { transform: scale(2.6); opacity: 0; transition: transform 1.3s cubic-bezier(.2, .8, .2, 1), opacity 1.3s; }
+html.kira-locked .app-shell { visibility: hidden; }
+@keyframes kira-lock-spin { to { transform: rotate(360deg); } }
+@keyframes kira-lock-shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@media (prefers-reduced-motion: reduce) { .kira-lock-rings i { animation: none; } .kira-lock.is-leaving, .kira-lock.is-leaving .kira-lock-rings { transition: none; } }
+
+/* Ícones do trilho: cada destino com a sua cor (roxo da Kira + acentos), brilho leve só por filter no SVG */
+.kui-rail-icon[data-icon] svg { transition: transform .18s ease, filter .18s ease, color .18s ease; }
+.kui-rail-icon[data-icon="home"]  { color: #c084fc; }
+.kui-rail-icon[data-icon="chat"]  { color: #22d3ee; }
+.kui-rail-icon[data-icon="bell"]  { color: #fbbf24; }
+.kui-rail-icon[data-icon="house"] { color: #34d399; }
+.kui-rail-icon[data-icon="book"]  { color: #f472b6; }
+.kui-rail-icon[data-icon="plus"], .kui-rail-icon[data-icon="window"] { color: #60a5fa; }
+.kui-sidebar-action:hover .kui-rail-icon[data-icon] svg { transform: scale(1.12); filter: drop-shadow(0 0 5px currentColor); }
+.kui-sidebar-action.kui-on .kui-rail-icon[data-icon] { color: #fff; }
+.kui-sidebar-action.kui-on .kui-rail-icon[data-icon] svg { filter: drop-shadow(0 0 6px rgba(255, 255, 255, .55)); }
+
+/* Configurações abertas: o relógio do topo vazava atrás da borda do painel (revisão de design, 2026-11-07) */
+body:has(#config-drawer.open) #header-clock { opacity: 0; visibility: hidden; transition: opacity .15s ease; }
+#kira-activity-orb, #kira-activity-orb::before, #kira-activity-orb::after { display: none !important; animation: none !important; } /* 2026-11-07: Chefe achou feio e pesado; o orbe já mostra que ela está trabalhando */

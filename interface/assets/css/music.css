@@ -1,0 +1,274 @@
+/* Aba Música no estilo Spotify: biblioteca à esquerda, busca e listas no centro, player fixo embaixo. */
+#music-drawer .mus-body.mus-spotify {
+  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+
+#music-drawer .mus-spotify .mus-side,
+#music-drawer .mus-spotify .mus-main {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 12px;
+  overflow-y: auto;
+}
+
+/* Sem bordas: cada área com uma linha de luz no alto, na sua cor (o mesmo visual das Configurações e do WhatsApp). */
+#music-drawer .mus-spotify .mus-side {
+  padding: 14px 10px;
+  background: linear-gradient(90deg, transparent, #c084fc 10%, #f5d0fe 24%, color-mix(in srgb, #c084fc 35%, transparent) 72%, transparent) top 0 left 12px / calc(100% - 24px) 2px no-repeat, linear-gradient(180deg, rgba(192, 132, 252, 0.12), transparent 70px), rgba(255, 255, 255, 0.035);
+}
+#music-drawer .mus-spotify .mus-side-title {
+  margin: 0 6px 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #f5f3ff;
+}
+#music-drawer .mus-spotify .mus-playlists-card {
+  border: 0;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+#music-drawer .mus-spotify .mus-playlists-header { padding: 0 6px 8px; }
+
+#music-drawer .mus-spotify .mus-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(90deg, transparent, #f472b6 10%, #fbcfe8 24%, color-mix(in srgb, #f472b6 35%, transparent) 72%, transparent) top 0 left 12px / calc(100% - 24px) 2px no-repeat, linear-gradient(180deg, rgba(126, 34, 206, 0.32) 0%, rgba(20, 10, 40, 0.75) 240px, rgba(8, 5, 18, 0.85) 100%);
+}
+#music-drawer .mus-spotify .mus-search-row { max-width: 520px; }
+#music-drawer .mus-spotify .mus-search-input { border-radius: 999px; padding-left: 16px; background: rgba(255, 255, 255, 0.08); }
+#music-drawer .mus-spotify .mus-left-content { border: 0; background: none; padding: 0; }
+#music-drawer .mus-spotify .mus-section-header { padding: 4px 2px 8px; }
+#music-drawer .mus-spotify .mus-section-label { font-size: 0.95rem; letter-spacing: 0.02em; color: #fff; }
+
+/* Moldura leve: a CPU desenha esta tela; degradês radiais e sombra de 80 px repintavam junto com cada linha. */
+#music-drawer.side-drawer {
+  background: #08061a !important;
+  box-shadow: 0 0 0 1px rgba(120, 65, 220, 0.12), 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Linhas de faixa: clicar na linha toca; "+" guarda numa playlist. O destaque do mouse troca na hora (antes animava
+   o fundo por 150 ms e repintava a cada quadro: 11 quadros/s ao passar o mouse). */
+#music-drawer .mus-track {
+  --track-accent: #c084fc;
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px 48px minmax(0, 1fr) auto 30px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+}
+#music-drawer .mus-track:nth-child(3n + 2) { --track-accent: #f472b6; }
+#music-drawer .mus-track:nth-child(3n) { --track-accent: #22d3ee; }
+#music-drawer .mus-track:hover,
+#music-drawer .mus-track:focus-visible {
+  background: color-mix(in srgb, var(--track-accent) 12%, rgba(12, 8, 26, 0.9));
+  box-shadow: inset 2px 0 0 var(--track-accent);
+}
+#music-drawer .mus-track.is-active {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.1) 70%, transparent);
+  box-shadow: inset 3px 0 0 #f0abfc;
+}
+#music-drawer .mus-track-num { font-size: 0.7rem; font-weight: 700; text-align: center; color: rgba(196, 181, 253, 0.5); font-variant-numeric: tabular-nums; }
+#music-drawer .mus-track:hover .mus-track-num { color: var(--track-accent); }
+#music-drawer .mus-track-art { position: relative; width: 48px; height: 48px; overflow: hidden; border-radius: 8px; background: linear-gradient(135deg, #3b1764, #120a26); }
+#music-drawer .mus-track-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Triângulo de tocar sobre a capa ao passar o mouse (sem repintar a linha toda). */
+#music-drawer .mus-track-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 4, 24, 0.55);
+  opacity: 0;
+}
+#music-drawer .mus-track-play::before { content: ""; border-left: 12px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+#music-drawer .mus-track:hover .mus-track-play { opacity: 1; }
+#music-drawer .mus-track-info { display: grid; gap: 2px; min-width: 0; }
+#music-drawer .mus-track-title { overflow: hidden; color: #f5f3ff; font-size: 0.8rem; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+#music-drawer .mus-track.is-active .mus-track-title { color: #f0abfc; }
+#music-drawer .mus-track-sub { overflow: hidden; color: rgba(196, 181, 253, 0.62); font-size: 0.68rem; white-space: nowrap; text-overflow: ellipsis; }
+#music-drawer .mus-track-time { padding: 2px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); color: rgba(233, 213, 255, 0.8); font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+#music-drawer .mus-track-time:empty { display: none; }
+#music-drawer .mus-track-add {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--track-accent) 16%, rgba(255, 255, 255, 0.04));
+  color: #e9d5ff;
+  cursor: pointer;
+}
+#music-drawer .mus-track-add svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+#music-drawer .mus-track-add:hover,
+#music-drawer .mus-track-add:focus-visible { color: #fff; background: color-mix(in srgb, var(--track-accent) 42%, #0b0716); outline: none; }
+/* Equalizador da faixa que está tocando: três barras que sobem e descem (só transform; param com a música). */
+#music-drawer .mus-eq { position: absolute; inset: auto 0 6px; display: none; justify-content: center; align-items: flex-end; gap: 3px; height: 18px; }
+#music-drawer .mus-track.is-active .mus-eq { display: flex; }
+#music-drawer .mus-track.is-active .mus-track-play { opacity: 0; }
+#music-drawer .mus-eq i { width: 4px; height: 100%; border-radius: 2px; background: #f0abfc; transform-origin: bottom; transform: scaleY(0.35); will-change: transform; }
+#music-drawer.is-playing .mus-track.is-active .mus-eq i { animation: mus-eq 0.9s ease-in-out infinite; }
+#music-drawer .mus-eq i:nth-child(2) { animation-delay: -0.3s; }
+#music-drawer .mus-eq i:nth-child(3) { animation-delay: -0.6s; }
+@keyframes mus-eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+html[data-kira-motion="off"] #music-drawer .mus-eq i { animation: none !important; }
+
+/* Player embaixo, de ponta a ponta. */
+#music-drawer .mus-spotify .mus-player-bar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, transparent, #22d3ee 10%, #cffafe 24%, color-mix(in srgb, #22d3ee 35%, transparent) 72%, transparent) top 0 left 12px / calc(100% - 24px) 2px no-repeat, rgba(3, 2, 8, 0.82);
+}
+#music-drawer .mus-spotify .mus-now-row { min-width: 0; margin: 0; }
+#music-drawer .mus-spotify .mus-now-thumb { width: 56px; height: 56px; border-radius: 6px; }
+#music-drawer .mus-spotify .mus-bar-center { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+#music-drawer .mus-spotify .mus-controls-row { justify-content: center; gap: 14px; margin: 0; }
+#music-drawer .mus-spotify .mus-ctrl-play {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  color: #12081f;
+  box-shadow: none;
+}
+#music-drawer .mus-spotify .mus-ctrl-play:hover { transform: scale(1.06); background: #f3e8ff; }
+#music-drawer .mus-spotify .mus-progress-wrap { width: 100%; margin: 0; }
+#music-drawer .mus-spotify .mus-volume-row { justify-self: end; width: min(180px, 100%); }
+
+@media (max-width: 860px) {
+  #music-drawer .mus-body.mus-spotify { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr) auto; }
+  #music-drawer .mus-spotify .mus-side { max-height: 160px; }
+  #music-drawer .mus-spotify .mus-player-bar { grid-template-columns: 1fr; }
+  #music-drawer .mus-spotify .mus-volume-row { justify-self: center; }
+}
+
+/* Mini player no canto ("tocando agora"): aparece com música tocando e a aba Música fechada, e no lugar do vídeo
+   minimizado. Estilo escolhido na aba Aparência (html[data-kira-player]); animações só com transform. */
+.kira-now-playing {
+  position: fixed;
+  right: 92px;
+  bottom: 20px;
+  z-index: 15;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 370px;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 14px;
+  background: #0d0820;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  color: #f5f3ff;
+  animation: kira-now-playing-in 0.25s ease-out both;
+}
+.kira-now-playing[hidden] { display: none; }
+@keyframes kira-now-playing-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.kira-np-art { position: relative; width: 52px; height: 52px; }
+.kira-np-art img { position: relative; width: 100%; height: 100%; border-radius: 9px; object-fit: cover; background: #1e1036; }
+.kira-np-disc { display: none; }
+.kira-now-playing-text { min-width: 0; cursor: pointer; }
+.kira-now-playing-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.8rem; font-weight: 700; }
+.kira-now-playing-artist { overflow: hidden; margin-top: 1px; white-space: nowrap; text-overflow: ellipsis; font-size: 0.66rem; color: #c4b5fd; }
+.kira-now-playing-artist:empty { display: none; }
+.kira-now-playing-time { margin-top: 2px; font-size: 0.64rem; opacity: 0.7; font-variant-numeric: tabular-nums; }
+.kira-now-playing-bar { height: 3px; margin-top: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+.kira-now-playing-bar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #a855f7, #f0abfc); }
+.kira-np-eq { display: none; align-items: flex-end; gap: 3px; height: 26px; }
+.kira-np-eq i { width: 4px; height: 100%; border-radius: 2px; background: linear-gradient(180deg, #f0abfc, #a855f7); transform-origin: bottom; transform: scaleY(0.3); will-change: transform; }
+.kira-now-playing.is-playing .kira-np-eq i { animation: kira-np-eq 1s ease-in-out infinite; }
+.kira-np-eq i:nth-child(2) { animation-delay: -0.2s; }
+.kira-np-eq i:nth-child(3) { animation-delay: -0.45s; }
+.kira-np-eq i:nth-child(4) { animation-delay: -0.7s; }
+.kira-np-eq i:nth-child(5) { animation-delay: -0.85s; }
+@keyframes kira-np-eq { 0%, 100% { transform: scaleY(0.25); } 50% { transform: scaleY(1); } }
+.kira-now-playing-buttons { display: flex; gap: 4px; align-items: center; }
+.kira-now-playing button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.kira-now-playing button:hover { background: rgba(168, 85, 247, 0.4); }
+.kira-now-playing button.is-main { width: 32px; height: 32px; background: #fff; color: #12081f; }
+.kira-now-playing button.is-stop { width: 22px; height: 22px; font-size: 0.62rem; opacity: 0.7; }
+.kira-now-playing button[hidden] { display: none; }
+.kira-now-playing button:focus-visible { outline: 2px solid #d8b4fe; outline-offset: 2px; }
+
+/* Neon (padrão): borda que acende em degradê. */
+html:not([data-kira-player]) .kira-now-playing,
+html[data-kira-player="neon"] .kira-now-playing {
+  border-color: transparent;
+  background: linear-gradient(#0d0820, #0d0820) padding-box, linear-gradient(120deg, #a855f7, #ec4899, #22d3ee) border-box;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 16px rgba(168, 85, 247, 0.3);
+}
+
+/* Cápsula: pílula compacta, capa redonda que gira devagar enquanto toca. */
+html[data-kira-player="capsula"] .kira-now-playing { grid-template-columns: 40px minmax(0, 1fr) auto; width: 330px; padding: 6px 8px 6px 6px; border-radius: 999px; }
+html[data-kira-player="capsula"] .kira-now-playing-buttons button:first-child { display: none; }
+html[data-kira-player="capsula"] .kira-np-art { width: 40px; height: 40px; }
+html[data-kira-player="capsula"] .kira-np-art img { border-radius: 50%; will-change: transform; }
+html[data-kira-player="capsula"] .kira-now-playing.is-playing .kira-np-art img { animation: kira-np-spin 9s linear infinite; }
+html[data-kira-player="capsula"] .kira-now-playing-time,
+html[data-kira-player="capsula"] .kira-now-playing-bar,
+html[data-kira-player="capsula"] .kira-now-playing-artist { display: none; }
+
+/* Vinil: cartão em pé com o disco girando e a capa no selo do centro. */
+html[data-kira-player="vinil"] .kira-now-playing { grid-template-columns: 1fr; justify-items: center; width: 210px; padding: 14px 14px 12px; text-align: center; }
+html[data-kira-player="vinil"] .kira-np-art { width: 120px; height: 120px; will-change: transform; }
+html[data-kira-player="vinil"] .kira-np-disc {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #0b0b10 0 2px, #17121f 2px 4px);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5);
+}
+html[data-kira-player="vinil"] .kira-np-art img { position: absolute; inset: 34%; width: 32%; height: 32%; border-radius: 50%; }
+html[data-kira-player="vinil"] .kira-now-playing.is-playing .kira-np-art { animation: kira-np-spin 6s linear infinite; }
+html[data-kira-player="vinil"] .kira-now-playing-text { width: 100%; }
+
+/* Onda: barra larga com equalizador que pulsa com a música. */
+html[data-kira-player="onda"] .kira-now-playing {
+  grid-template-columns: 44px minmax(0, 1fr) auto auto;
+  width: 410px;
+  border-color: rgba(34, 211, 238, 0.45);
+  background: linear-gradient(100deg, #12082a, #0a1424);
+}
+html[data-kira-player="onda"] .kira-np-art { width: 44px; height: 44px; }
+html[data-kira-player="onda"] .kira-np-eq { display: flex; }
+html[data-kira-player="onda"] .kira-np-eq i { background: linear-gradient(180deg, #67e8f9, #a855f7); }
+html[data-kira-player="onda"] .kira-now-playing-bar span { background: linear-gradient(90deg, #22d3ee, #a855f7); }
+
+@keyframes kira-np-spin { to { transform: rotate(360deg); } }
+html[data-kira-motion="off"] .kira-now-playing *,
+html[data-kira-motion="off"] .kira-now-playing { animation: none !important; }
+
+/* Playlists da biblioteca no mesmo visual: sem contorno, linha de luz à esquerda; o destaque troca na hora (sem
+   transição de fundo, que repintava a cada quadro). */
+#music-drawer .mus-spotify .music-playlist-item { border: 0; background: rgba(255, 255, 255, 0.04); box-shadow: none; transition: none; }
+#music-drawer .mus-spotify .music-playlist-item:hover { background: rgba(168, 85, 247, 0.16); box-shadow: inset 2px 0 0 #c084fc; }
+#music-drawer .mus-spotify .music-playlist-item.active { background: rgba(168, 85, 247, 0.24); box-shadow: inset 3px 0 0 #f0abfc; }

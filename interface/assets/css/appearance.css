@@ -1,0 +1,165 @@
+/* Aparência: fundos, orbes alternativos e o bloco "Estilo" da aba Aparência. */
+:root { --kira-accent-rgb: 168, 85, 247; }
+
+/* Fundos. "galaxy" é o Fundo.png de sempre. */
+html[data-kira-bg="black"] body,
+html[data-kira-bg="grid"] body { background: #000; }
+html[data-kira-bg="black"] body::before,
+html[data-kira-bg="grid"] body::before { background: transparent; }
+html[data-kira-bg="grid"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(var(--kira-accent-rgb), 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--kira-accent-rgb), 0.22) 1px, transparent 1px),
+    linear-gradient(rgba(var(--kira-accent-rgb), 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--kira-accent-rgb), 0.07) 1px, transparent 1px);
+  background-size: 176px 176px, 176px 176px, 44px 44px, 44px 44px;
+  background-position: center center;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, rgba(0, 0, 0, 0.35) 75%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, #000 35%, rgba(0, 0, 0, 0.35) 75%, transparent 100%);
+}
+
+/* Orbes alternativos: a galáxia some (e fica pausada pelo appearance.js), o canvas novo ocupa o lugar. */
+.orb-alt-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: none;
+  pointer-events: none;
+}
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) .orb-alt-canvas { display: block; }
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) #kira-3d-canvas,
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) .orb-hud-system { visibility: hidden; }
+/* O kira-3d.js marca o próprio canvas com visibility inline. */
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) #kira-3d-canvas canvas { visibility: hidden !important; }
+
+/* Seletores da aba Aparência (cada grupo dentro do seu cartão). */
+#config-panel-visual .appearance-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#config-panel-visual .appearance-options-accent { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#config-panel-visual .appearance-options-player { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#config-panel-visual .appearance-options-orb .appearance-option-preview { width: 52px; height: 52px; }
+/* Miniaturas do mini player: o desenho de cada estilo, parado. */
+#config-panel-visual .appearance-options-player .appearance-option { gap: 4px; padding: 7px 6px 6px; }
+#config-panel-visual .appearance-option-preview.appearance-player { position: relative; display: block; width: 100%; height: 30px; border-radius: 8px; background: #0d0820; border: 1px solid rgba(168, 85, 247, 0.5); }
+#config-panel-visual .appearance-player-art { position: absolute; top: 5px; left: 6px; width: 18px; height: 18px; border-radius: 4px; background: linear-gradient(135deg, #a855f7, #ec4899); }
+#config-panel-visual .appearance-player-lines { position: absolute; top: 8px; left: 30px; right: 10px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.55); box-shadow: 0 7px 0 rgba(196, 181, 253, 0.35); }
+#config-panel-visual .appearance-player-eq { display: none; }
+#config-panel-visual .appearance-option-preview.appearance-player-neon { border-color: transparent; background: linear-gradient(#0d0820, #0d0820) padding-box, linear-gradient(120deg, #a855f7, #ec4899, #22d3ee) border-box; }
+#config-panel-visual .appearance-option-preview.appearance-player-capsula { border-radius: 999px; }
+#config-panel-visual .appearance-player-capsula .appearance-player-art { border-radius: 50%; }
+#config-panel-visual .appearance-player-vinil .appearance-player-art { top: 3px; left: calc(50% - 12px); width: 24px; height: 24px; border-radius: 50%; background: repeating-radial-gradient(circle, #0b0b10 0 1px, #2a1f3a 1px 2px); box-shadow: 0 0 0 1px #a855f7; }
+#config-panel-visual .appearance-player-vinil .appearance-player-lines { display: none; }
+#config-panel-visual .appearance-option-preview.appearance-player-onda { border-color: rgba(34, 211, 238, 0.55); background: linear-gradient(100deg, #12082a, #0a1424); }
+#config-panel-visual .appearance-player-onda .appearance-player-lines { right: 34px; }
+#config-panel-visual .appearance-player-onda .appearance-player-eq {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  display: block;
+  width: 20px;
+  height: 16px;
+  background: linear-gradient(90deg, #67e8f9 0 3px, transparent 3px 5px, #a855f7 5px 8px, transparent 8px 10px, #67e8f9 10px 13px, transparent 13px 15px, #a855f7 15px 18px, transparent 18px);
+  -webkit-mask: linear-gradient(0deg, #000 60%, transparent 60%) 0 0 / 5px 100% repeat-x;
+}
+#config-panel-visual .appearance-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px 8px;
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  border-radius: 12px;
+  background: rgba(10, 6, 22, 0.7);
+  color: #d8c8f5;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+}
+#config-panel-visual .appearance-options-accent .appearance-option { flex-direction: row; justify-content: center; padding: 8px; }
+#config-panel-visual .appearance-option:hover { border-color: rgba(216, 180, 254, 0.6); transform: translateY(-1px); }
+#config-panel-visual .appearance-option.is-selected {
+  border-color: rgba(216, 180, 254, 0.9);
+  background: rgba(88, 28, 135, 0.35);
+  box-shadow: 0 0 0 1px rgba(216, 180, 254, 0.25) inset, 0 0 18px rgba(168, 85, 247, 0.25);
+  color: #fff;
+}
+#config-panel-visual .appearance-option:focus-visible { outline: 2px solid #d8b4fe; outline-offset: 2px; }
+#config-panel-visual .appearance-option-preview {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #000;
+}
+#config-panel-visual .appearance-galaxy-art {
+  background:
+    radial-gradient(circle at 50% 50%, #fff 0 4%, rgba(240, 171, 252, 0.85) 10%, rgba(168, 85, 247, 0.35) 30%, transparent 55%),
+    conic-gradient(from 30deg, transparent, rgba(168, 85, 247, 0.4), transparent 30%, rgba(110, 231, 255, 0.25), transparent 60%, rgba(236, 72, 153, 0.3), transparent 85%),
+    #05020d;
+}
+#config-panel-visual .appearance-bg-galaxy { border-radius: 8px; width: 100%; height: 44px; background: url("../ui/Fundo.png") center / cover, #05020d; }
+#config-panel-visual .appearance-bg-black { border-radius: 8px; width: 100%; height: 44px; background: #000; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset; }
+#config-panel-visual .appearance-bg-grid {
+  border-radius: 8px;
+  width: 100%;
+  height: 44px;
+  background:
+    linear-gradient(rgba(var(--kira-accent-rgb), 0.45) 1px, transparent 1px) 0 0 / 11px 11px,
+    linear-gradient(90deg, rgba(var(--kira-accent-rgb), 0.45) 1px, transparent 1px) 0 0 / 11px 11px,
+    #000;
+}
+#config-panel-visual .appearance-accent-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 10px var(--dot);
+}
+/* Os ajustes finos são da galáxia; com outro orbe eles não têm efeito e ficam escondidos. */
+html[data-kira-orb]:not([data-kira-orb="galaxy"]) #config-panel-visual .appearance-galaxy-only { display: none; }
+
+/* Miniaturas de menu, chat e relógio (appearance.js mini()) */
+#config-panel-visual .appearance-mini { position: relative; display: flex; width: 100%; height: 42px; border-radius: 8px; background: #0d0820; border: 1px solid rgba(168, 85, 247, .45); overflow: hidden; }
+.appearance-mini-menu { flex-direction: column; justify-content: center; gap: 4px; padding-left: 7px; }
+.appearance-mini-menu i { width: 14px; height: 5px; border-radius: 2px; background: rgba(255, 255, 255, .3); }
+.appearance-mini-menu i:nth-child(2) { background: #a855f7; }
+.appearance-mini-menu.is-pilula i { width: 18px; border-radius: 9px; } .appearance-mini-menu.is-pilula i:nth-child(2) { background: linear-gradient(90deg, #7c3aed, #c026d3); }
+.appearance-mini-menu.is-trilho { border-left: 3px solid #2c1d48; } .appearance-mini-menu.is-trilho i:nth-child(2) { width: 24px; height: 8px; background: linear-gradient(135deg, #7c3aed, #db2777); box-shadow: 0 0 8px #db2777; }
+.appearance-mini-menu.is-apps i { width: 7px; height: 7px; border-radius: 2px; background: #38bdf8; } .appearance-mini-menu.is-apps i:nth-child(odd) { background: #f472b6; } .appearance-mini-menu.is-apps i:nth-child(2) { outline: 1px solid #fff; }
+.appearance-mini-chat { flex-direction: column; justify-content: center; gap: 4px; padding: 0 8px; }
+.appearance-mini-chat .o { display: none; }
+.appearance-mini-chat .b { width: 60%; height: 7px; border-radius: 4px; background: rgba(168, 85, 247, .55); } .appearance-mini-chat .b + .b { align-self: flex-end; background: rgba(255, 255, 255, .3); }
+.appearance-mini-chat.is-orbe { align-items: center; } .appearance-mini-chat.is-orbe .o { display: block; position: absolute; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(#c084fc, #581c87 70%); box-shadow: 0 0 10px #a855f7; }
+.appearance-mini-chat.is-orbe .b { position: relative; width: 70%; background: rgba(13, 8, 32, .7); border: 1px solid rgba(255, 255, 255, .35); }
+.appearance-mini-clock { align-items: center; justify-content: center; }
+.appearance-mini-clock .t::before { content: '12:34'; font: 600 13px/1 system-ui; color: #e9d5ff; }
+.appearance-mini-clock.is-minimo .t::before { font-weight: 300; color: #fff; }
+.appearance-mini-clock.is-neon .t::before { color: #f0abfc; text-shadow: 0 0 6px #d946ef, 0 0 12px #a855f7; }
+.appearance-mini-clock.is-vidro .t { padding: 3px 7px; border-radius: 7px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .3); }
+.appearance-mini-clock.is-terminal .t::before { content: '> 12:34_'; font-family: Consolas, monospace; color: #4ade80; }
+.appearance-mini-clock.is-analogico .t { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #c4b5fd; background: linear-gradient(#e9d5ff, #e9d5ff) 50% 30%/2px 9px no-repeat, linear-gradient(#e9d5ff, #e9d5ff) 65% 50%/7px 2px no-repeat; } .appearance-mini-clock.is-analogico .t::before { content: none; }
+.appearance-mini-clock.is-oculto { border-style: dashed; } .appearance-mini-clock.is-oculto .t::before { content: '—'; color: #6b5a8a; }
+/* miniaturas da Casa inteligente */
+.appearance-mini-home { align-items: center; justify-content: center; gap: 4px; padding: 0 6px; }
+.appearance-mini-home i { flex: 1; height: 22px; border-radius: 4px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .25); }
+.appearance-mini-home.is-cartao i:first-child { flex: 1.6; background: linear-gradient(135deg, rgba(168, 85, 247, .5), rgba(236, 72, 153, .3)); }
+.appearance-mini-home.is-lista { flex-direction: column; } .appearance-mini-home.is-lista i { flex: none; width: 100%; height: 7px; border-radius: 3px; }
+
+/* Globo 3D (WebGL) sem renderer 2D: esfera com meridianos e paralelos desenhados em gradientes */
+#config-panel-visual .appearance-globe-art {
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(var(--kira-accent-rgb, 168, 85, 247), .55) 7px 8px),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(var(--kira-accent-rgb, 168, 85, 247), .4) 7px 8px),
+    radial-gradient(circle at 35% 30%, rgba(233, 213, 255, .9), rgba(var(--kira-accent-rgb, 168, 85, 247), .55) 45%, #12062a 75%);
+  box-shadow: inset -8px -8px 14px rgba(0, 0, 0, .55), 0 0 14px rgba(var(--kira-accent-rgb, 168, 85, 247), .35);
+}

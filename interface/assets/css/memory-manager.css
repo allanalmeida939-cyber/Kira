@@ -1,0 +1,111 @@
+.kira-memory-manager {
+  min-height: 100%;
+}
+
+.kira-memory-scroll {
+  padding-bottom: 28px;
+}
+
+.kira-memory-grid {
+  align-items: start;
+}
+
+.kira-memory-card {
+  min-width: 0;
+}
+
+.kira-memory-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.kira-memory-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--card-accent, #a78bfa) 22%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card-accent, #a78bfa) 7%, transparent);
+}
+
+.kira-memory-metric strong {
+  color: var(--text-primary, #f8fafc);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.kira-memory-metric span,
+.kira-memory-meta {
+  color: var(--text-muted, #94a3b8);
+  font-size: .76rem;
+}
+
+.kira-memory-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .7fr);
+  gap: 8px;
+}
+
+.kira-memory-form input:first-child,
+.kira-memory-form button {
+  grid-column: 1 / -1;
+}
+
+.kira-memory-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid color-mix(in srgb, #94a3b8 14%, transparent);
+  color: var(--text-secondary, #cbd5e1);
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
+.kira-memory-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.kira-memory-row-main {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.kira-memory-row-main strong {
+  color: var(--text-primary, #f8fafc);
+  overflow-wrap: anywhere;
+}
+
+.kira-memory-steps {
+  color: var(--text-muted, #94a3b8);
+  font-size: .78rem;
+  overflow-wrap: anywhere;
+}
+
+.kira-memory-manager .kira-switch {
+  flex: 0 0 auto;
+}
+
+.kira-memory-manager .kira-settings-status {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+@media (max-width: 620px) {
+  .kira-memory-form {
+    grid-template-columns: 1fr;
+  }
+
+  .kira-memory-form input,
+  .kira-memory-form select,
+  .kira-memory-form button {
+    grid-column: 1;
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "core_mode": true,
+  "optional_modules": {
+    "messages": {
+      "enabled": false,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "manus": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "internet": {
+      "enabled": false,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "system_vitals": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false,
+      "polling_when_hidden": false,
+      "visible_interval_ms": 10000,
+      "temporary_interval_ms": 5000,
+      "temporary_duration_ms": 60000
+    },
+    "pc_operator": {
+      "enabled": false,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "music": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "vision": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "panels": {
+      "enabled": false,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "diagnostics": {
+      "enabled": false,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "whatsapp": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false
+    },
+    "browser": {
+      "enabled": true,
+      "autoload": false,
+      "show_when_disabled": false
+    }
+  },
+  "boot": {
+    "profile": "minimal",
+    "extras_lazy": true,
+    "memory_required": false,
+    "start_optional_services": false
+  },
+  "features": {
+    "manus_autostart": false,
+    "whatsapp_autostart": false,
+    "browser_autostart": false,
+    "vision_autostart": false,
+    "music_autostart": false,
+    "system_vitals_autostart": false,
+    "desktop_operator_autostart": false,
+    "manus": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "shutdown_after_task": true,
+      "validate_before_ack": true,
+      "save_to_default_folder": true
+    },
+    "browser": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "headless": true,
+      "persistent_profile": true,
+      "idle_shutdown_seconds": 300,
+      "screenshot_view": true,
+      "max_fps": 2,
+      "jpeg_quality": 70
+    },
+    "whatsapp": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "idle_shutdown_seconds": 300,
+      "require_confirmation_before_send": true,
+      "allow_secretary_mode": false
+    },
+    "vision": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "provider": "livekit",
+      "legacy_providers_disabled": true
+    },
+    "music": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "idle_shutdown_seconds": 300,
+      "start_on_tab_open": true,
+      "shutdown_when_tab_closed": true,
+      "stop_when_not_playing": true
+    },
+    "system_vitals": {
+      "enabled": true,
+      "autostart": false,
+      "lazy": true,
+      "poll_only_when_visible": true,
+      "poll_interval_seconds": 2,
+      "idle_shutdown_seconds": 30,
+      "light_status_without_collection": true
+    }
+  }
+}
